@@ -25,12 +25,19 @@ from .test_views import teste_mensagens
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', TemplateView.as_view(template_name='home.html'), name='home'),
+    
+    # Apps do projeto
     path('produtos/', include('produtos.urls')),
     path('usuarios/', include('usuarios.urls')),
     path('carrinho/', include('carrinho.urls')),
     path('pedidos/', include('pedidos.urls')),
     path('pagamentos/', include('pagamentos.urls')),
     path('painel/', include('adminpanel.urls')),
+    
+    # Django Allauth URLs
+    path('accounts/', include('allauth.urls')),
+    
+    # Teste
     path('teste-mensagens/', teste_mensagens, name='teste_mensagens'),
 ]
 

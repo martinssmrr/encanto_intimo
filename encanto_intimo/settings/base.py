@@ -28,8 +28,15 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",  # Necessário para allauth
     
-    # Third Party Apps
+    # Third Party Apps - Allauth
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    
+    # Third Party Apps - Outros
     'crispy_forms',
     'crispy_tailwind',
     'widget_tweaks',
@@ -52,6 +59,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "allauth.account.middleware.AccountMiddleware",  # Necessário para allauth
 ]
 
 ROOT_URLCONF = "encanto_intimo.urls"
@@ -67,6 +75,8 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "carrinho.context_processors.carrinho",
+                # Allauth context processors
+                "django.template.context_processors.request",
             ],
         },
     },
@@ -200,3 +210,66 @@ LOGGING = {
         },
     },
 }
+
+# ===========================
+# DJANGO-ALLAUTH CONFIGURATION
+# ===========================
+
+# Site framework (necessário para allauth)
+SITE_ID = 1
+
+# Backends de autenticação
+AUTHENTICATION_BACKENDS = [
+    # Backend padrão do Django (para login com username/password)
+    'django.contrib.auth.backends.ModelBackend',
+    
+    # Backend do allauth (para login social)
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+# Configurações do django-allauth (versão atualizada)
+ACCOUNT_EMAIL_VERIFICATION = 'optional'  # 'mandatory', 'optional' ou 'none'
+ACCOUNT_UNIQUE_EMAIL = True
+
+# Nova sintaxe para campos de signup e métodos de login
+ACCOUNT_SIGNUP_FIELDS = ['email']  # Apenas email é obrigatório
+ACCOUNT_LOGIN_METHODS = {'email'}  # Login apenas com email
+
+# Nova sintaxe para rate limiting
+ACCOUNT_RATE_LIMITS = {
+    'login_failed': '5/5m',  # 5 tentativas por 5 minutos
+}
+
+# URLs de redirecionamento
+LOGIN_REDIRECT_URL = '/usuarios/perfil/'  # Redireciona para o perfil após login
+LOGOUT_REDIRECT_URL = '/'  # Redireciona para home após logout
+ACCOUNT_LOGOUT_REDIRECT_URL = '/'
+
+# Configurações do provedor Google
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+        'OAUTH_PKCE_ENABLED': True,
+        'APP': {
+            'client_id': config('GOOGLE_CLIENT_ID', default=''),
+            'secret': config('GOOGLE_CLIENT_SECRET', default=''),
+            'key': ''
+        }
+    }
+}
+
+# Configurações adicionais
+SOCIALACCOUNT_LOGIN_ON_GET = True
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_EMAIL_REQUIRED = True
+SOCIALACCOUNT_EMAIL_VERIFICATION = 'optional'
+
+# Adaptadores personalizados
+ACCOUNT_ADAPTER = 'usuarios.adapters.CustomAccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'usuarios.adapters.CustomSocialAccountAdapter'
