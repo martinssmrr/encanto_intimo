@@ -11,6 +11,8 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "encanto_intimo.settings")
+# Para produção, certifique-se de que a variável de ambiente 
+# DJANGO_SETTINGS_MODULE está definida como 'encanto_intimo.settings.prod'
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "encanto_intimo.settings.prod")
 
 application = get_wsgi_application()

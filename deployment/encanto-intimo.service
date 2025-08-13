@@ -1,0 +1,63 @@
+# Configuração Systemd para Gunicorn - Encanto Íntimo
+# Salve este arquivo em: /etc/systemd/system/encanto-intimo.service
+# Depois execute:
+# sudo systemctl daemon-reload
+# sudo systemctl enable encanto-intimo
+# sudo systemctl start encanto-intimo
+
+[Unit]
+Description=Encanto Íntimo Django Application
+Requires=encanto-intimo.socket
+After=network.target
+
+[Service]
+Type=notify
+# Usuário e grupo para executar o serviço
+User=www-data
+Group=www-data
+
+# Diretório do projeto
+WorkingDirectory=/var/www/encanto-intimo
+# Comando para executar o Gunicorn
+ExecStart=/var/www/encanto-intimo/venv/bin/gunicorn \
+    --pid /run/encanto-intimo/encanto-intimo.pid \
+    --bind unix:/run/encanto-intimo/encanto-intimo.sock \
+    --workers 3 \
+    --worker-class gevent \
+    --worker-connections 1000 \
+    --max-requests 1000 \
+    --max-requests-jitter 100 \
+    --timeout 30 \
+    --keep-alive 2 \
+    --log-level info \
+    --log-file /var/log/encanto-intimo/gunicorn.log \
+    --access-logfile /var/log/encanto-intimo/access.log \
+    --error-logfile /var/log/encanto-intimo/error.log \
+    encanto_intimo.wsgi:application
+
+# Configurações de execução
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=5
+PrivateTmp=true
+
+# Reiniciar automaticamente em caso de falha
+Restart=on-failure
+RestartSec=5
+
+# Variáveis de ambiente
+Environment=DJANGO_SETTINGS_MODULE=encanto_intimo.settings.prod
+Environment=PYTHONPATH=/var/www/encanto-intimo
+Environment=PYTHONUNBUFFERED=1
+
+# Arquivos PID e runtime
+PIDFile=/run/encanto-intimo/encanto-intimo.pid
+RuntimeDirectory=encanto-intimo
+RuntimeDirectoryMode=755
+
+# Logs
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

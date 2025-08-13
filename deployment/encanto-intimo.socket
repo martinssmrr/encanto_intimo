@@ -1,0 +1,14 @@
+# Socket Systemd para Gunicorn - Encanto Íntimo
+# Salve este arquivo em: /etc/systemd/system/encanto-intimo.socket
+
+[Unit]
+Description=Encanto Íntimo Django Application Socket
+
+[Socket]
+ListenStream=/run/encanto-intimo/encanto-intimo.sock
+SocketUser=www-data
+SocketGroup=www-data
+SocketMode=0660
+
+[Install]
+WantedBy=sockets.target

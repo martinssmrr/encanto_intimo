@@ -1,0 +1,40 @@
+# === DESENVOLVIMENTO ===
+# Dependências específicas para desenvolvimento
+
+# Core Django (mesmas de produção)
+Django>=5.2,<6.0
+python-decouple>=3.8
+
+# Database SQLite (incluído no Python)
+# Não precisa instalar nada
+
+# Forms e UI
+django-crispy-forms>=2.0
+crispy-tailwind>=0.5
+django-widget-tweaks>=1.5
+
+# Upload de arquivos
+Pillow>=10.0.0
+
+# Pagamentos (chaves de teste)
+stripe>=7.0.0
+mercadopago>=2.2.0
+
+# === FERRAMENTAS DE DESENVOLVIMENTO ===
+django-debug-toolbar>=4.2.0
+django-extensions>=3.2.0
+
+# Testes
+pytest>=7.4.0
+pytest-django>=4.7.0
+pytest-cov>=4.1.0
+factory-boy>=3.3.0
+
+# Linting e formatação
+flake8>=6.1.0
+black>=23.9.0
+isort>=5.12.0
+
+# Documentação
+sphinx>=7.2.0
+sphinx-rtd-theme>=1.3.0
