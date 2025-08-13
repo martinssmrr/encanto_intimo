@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Desejos Secretos - Carrinho de Compras{% endblock %}
+
+{% block extra_css %}
+<!-- Bootstrap 5 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Carrinho CSS -->
+<link rel="stylesheet" href="{% static 'css/carrinho.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none">Início</a></li>
+            <li class="breadcrumb-item active">Carrinho</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">
+                <i class="fas fa-shopping-cart text-primary"></i>
+                Meu Carrinho
+            </h2>
+        </div>
+    </div>
+
+    {% if tem_itens %}
+    <div class="row">
+        <!-- Lista de Itens -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Itens no Carrinho ({{ carrinho.total_itens }})</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% for item in itens %}
+                    <div class="cart-item border-bottom p-3" data-item-id="{{ item.id }}">
+                        <div class="row align-items-center">
+                            <!-- Imagem do Produto -->
+                            <div class="col-md-2 text-center">
+                                {% if item.produto.imagem_principal %}
+                                    <img src="{{ item.produto.imagem_principal.url }}" 
+                                         alt="{{ item.produto.nome }}" 
+                                         class="cart-item-image">
+                                {% else %}
+                                    <div class="cart-item-image bg-light d-flex align-items-center justify-content-center">
+                                        <i class="fas fa-heart text-muted"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Informações do Produto -->
+                            <div class="col-md-4">
+                                <h6 class="mb-1">
+                                    <a href="{{ item.produto.get_absolute_url }}" class="text-decoration-none text-dark">
+                                        {{ item.produto.nome }}
+                                    </a>
+                                </h6>
+                                {% if item.tamanho %}
+                                    <small class="text-muted">Tamanho: {{ item.tamanho }}</small><br>
+                                {% endif %}
+                                {% if item.cor %}
+                                    <small class="text-muted">Cor: {{ item.cor }}</small><br>
+                                {% endif %}
+                                <small class="text-muted">
+                                    Estoque: {{ item.produto.estoque_disponivel }} unidades
+                                </small>
+                            </div>
+
+                            <!-- Preço Unitário -->
+                            <div class="col-md-2 text-center">
+                                <div class="fw-bold text-primary">
+                                    R$ {{ item.preco_unitario|floatformat:2 }}
+                                </div>
+                                {% if item.produto.tem_promocao %}
+                                    <small class="text-muted text-decoration-line-through">
+                                        R$ {{ item.produto.preco|floatformat:2 }}
+                                    </small>
+                                {% endif %}
+                            </div>
+
+                            <!-- Quantidade -->
+                            <div class="col-md-2">
+                                <div class="input-group input-group-sm">
+                                    <button class="btn btn-outline-secondary btn-quantity btn-decrease" 
+                                            type="button" data-item-id="{{ item.id }}"
+                                            title="Diminuir quantidade"
+                                            aria-label="Diminuir quantidade do item">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <input type="number" 
+                                           class="form-control quantity-input" 
+                                           value="{{ item.quantidade }}" 
+                                           min="1" 
+                                           max="{{ item.produto.estoque_disponivel }}"
+                                           data-item-id="{{ item.id }}"
+                                           title="Quantidade do item"
+                                           aria-label="Quantidade">
+                                    <button class="btn btn-outline-secondary btn-quantity btn-increase" 
+                                            type="button" data-item-id="{{ item.id }}"
+                                            title="Aumentar quantidade"
+                                            aria-label="Aumentar quantidade do item">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Total do Item -->
+                            <div class="col-md-1 text-center">
+                                <div class="fw-bold item-total" data-item-id="{{ item.id }}">
+                                    R$ {{ item.total|floatformat:2 }}
+                                </div>
+                            </div>
+
+                            <!-- Remover -->
+                            <div class="col-md-1 text-center">
+                                <button class="btn btn-outline-danger btn-sm btn-remove" 
+                                        data-item-id="{{ item.id }}" 
+                                        title="Remover item">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Ações do Carrinho -->
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <a href="{% url 'produtos:lista' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Continuar Comprando
+                    </a>
+                </div>
+                <div class="col-md-6 text-end">
+                    <button class="btn btn-outline-danger" id="limpar-carrinho">
+                        <i class="fas fa-trash"></i> Limpar Carrinho
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resumo do Carrinho -->
+        <div class="col-lg-4">
+            <div class="cart-summary">
+                <!-- Calculadora de Frete -->
+                <div class="card shadow-sm mb-3">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-truck"></i> Calcular Frete
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <form id="calcular-frete">
+                            <div class="mb-3">
+                                <label for="cep" class="form-label">CEP de Entrega</label>
+                                <div class="input-group">
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="cep" 
+                                           name="cep" 
+                                           placeholder="00000-000"
+                                           value="{{ carrinho.cep_frete }}"
+                                           maxlength="9">
+                                    <button class="btn btn-primary" type="submit" 
+                                            title="Calcular frete"
+                                            aria-label="Calcular frete">
+                                        <i class="fas fa-calculator"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        <div id="resultado-frete" class="mt-2"></div>
+                    </div>
+                </div>
+
+                <!-- Resumo de Valores -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-calculator"></i> Resumo do Pedido
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal ({{ carrinho.total_itens }} itens):</span>
+                            <span class="subtotal">R$ {{ carrinho.subtotal|floatformat:2 }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Frete:</span>
+                            <span class="frete">
+                                {% if carrinho.valor_frete > 0 %}
+                                    R$ {{ carrinho.valor_frete|floatformat:2 }}
+                                {% else %}
+                                    A calcular
+                                {% endif %}
+                            </span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between fw-bold text-primary fs-5">
+                            <span>Total:</span>
+                            <span class="total">R$ {{ carrinho.total|floatformat:2 }}</span>
+                        </div>
+                        
+                        {% if carrinho.subtotal >= 199 %}
+                        <div class="alert alert-success mt-3 py-2">
+                            <i class="fas fa-gift"></i> Frete grátis!
+                        </div>
+                        {% else %}
+                        <div class="alert alert-info mt-3 py-2">
+                            <i class="fas fa-info-circle"></i> 
+                            Faltam R$ {{ falta_frete_gratis|floatformat:2 }} para frete grátis
+                        </div>
+                        {% endif %}
+
+                        <div class="d-grid gap-2 mt-3">
+                            <a href="{% url 'carrinho:checkout' %}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-credit-card"></i> Finalizar Compra
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <!-- Carrinho Vazio -->
+    <div class="row">
+        <div class="col-12">
+            <div class="text-center py-5">
+                <div class="mb-4">
+                    <i class="fas fa-shopping-cart text-muted empty-cart-icon"></i>
+                </div>
+                <h4 class="text-muted mb-3">Seu carrinho está vazio</h4>
+                <p class="text-muted mb-4">Que tal explorar nossos produtos e encontrar algo especial?</p>
+                <a href="{% url 'produtos:lista' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-heart"></i> Explorar Produtos
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Não é necessário JavaScript adicional aqui pois está no carrinho.js -->
+{% endblock %}

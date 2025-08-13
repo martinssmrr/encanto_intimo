@@ -1,0 +1,212 @@
+/* Carrinho CSS - Estilos para Sistema de Carrinho */
+
+/* Imagens dos produtos no carrinho */
+.cart-item-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* Input de quantidade */
+.quantity-input {
+    width: 80px;
+    text-align: center;
+}
+
+/* Botões de quantidade */
+.btn-quantity {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Calculadora de frete */
+.frete-calculator {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+/* Resumo do carrinho */
+.cart-summary {
+    position: sticky;
+    top: 100px;
+}
+
+/* Carrinho vazio - ícone */
+.empty-cart-icon {
+    font-size: 4rem;
+}
+
+/* Checkout - Resumo do carrinho */
+.checkout-summary {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    position: sticky;
+    top: 100px;
+}
+
+/* Indicador de etapas do checkout */
+.step-indicator {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+.step {
+    text-align: center;
+    flex: 1;
+    position: relative;
+}
+
+.step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 15px;
+    right: -50%;
+    width: 100%;
+    height: 2px;
+    background: #dee2e6;
+    z-index: 1;
+}
+
+.step.active::after {
+    background: #0d6efd;
+}
+
+.step-circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #dee2e6;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px;
+    position: relative;
+    z-index: 2;
+}
+
+.step.active .step-circle {
+    background: #0d6efd;
+    color: white;
+}
+
+.step.completed .step-circle {
+    background: #198754;
+    color: white;
+}
+
+/* Mini produtos no checkout */
+.product-mini {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.product-mini:last-child {
+    border-bottom: none;
+}
+
+.product-mini img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-right: 15px;
+}
+
+.product-mini-placeholder {
+    width: 50px;
+    height: 50px;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    margin-right: 15px;
+}
+
+/* Opções de pagamento */
+.payment-option {
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.payment-option:hover {
+    border-color: #0d6efd;
+}
+
+.payment-option.selected {
+    border-color: #0d6efd;
+    background: #f8f9ff;
+}
+
+/* Labels dos form floating */
+.form-floating label {
+    color: #6c757d;
+}
+
+/* Desconto PIX - hidden by default */
+.desconto-pix {
+    display: none !important;
+}
+
+/* Observações textarea */
+.observacoes-textarea {
+    height: 100px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .cart-item-image {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .quantity-input {
+        width: 60px;
+    }
+    
+    .btn-quantity {
+        width: 25px;
+        height: 25px;
+    }
+    
+    .cart-summary {
+        position: static;
+        top: auto;
+        margin-top: 20px;
+    }
+    
+    .checkout-summary {
+        position: static;
+        top: auto;
+        margin-top: 20px;
+    }
+    
+    .step-indicator {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .step {
+        flex: auto;
+        min-width: 120px;
+    }
+    
+    .step:not(:last-child)::after {
+        display: none;
+    }
+}

@@ -1,0 +1,586 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Meus Pedidos - Encanto Íntimo{% endblock %}
+
+{% block extra_css %}
+<!-- Bootstrap 5 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    .pedidos-container {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 2rem 0;
+    }
+    
+    .page-header {
+        background: linear-gradient(45deg, #ff6b9d, #c471ed);
+        color: white;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+        animation: float 20s infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
+    }
+    
+    .page-header h1 {
+        position: relative;
+        z-index: 1;
+        margin-bottom: 0.5rem;
+    }
+    
+    .page-header p {
+        position: relative;
+        z-index: 1;
+        opacity: 0.9;
+        margin: 0;
+    }
+    
+    .card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        transform: translateY(-2px);
+    }
+    
+    .pedido-card {
+        border-left: 5px solid #ff6b9d;
+    }
+    
+    .pedido-header {
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        padding: 1.5rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .pedido-numero {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #495057;
+        margin-bottom: 0.25rem;
+    }
+    
+    .pedido-data {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+    
+    .status-pendente { 
+        background: linear-gradient(45deg, #ffc107, #ffdb4d);
+        color: #856404; 
+    }
+    .status-processando { 
+        background: linear-gradient(45deg, #007bff, #4da6ff);
+        color: white; 
+    }
+    .status-enviado { 
+        background: linear-gradient(45deg, #28a745, #5cbd5c);
+        color: white; 
+    }
+    .status-entregue { 
+        background: linear-gradient(45deg, #17a2b8, #5bc0de);
+        color: white; 
+    }
+    .status-cancelado { 
+        background: linear-gradient(45deg, #dc3545, #e57373);
+        color: white; 
+    }
+    
+    .pedido-total {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #ff6b9d;
+    }
+    
+    .pedido-itens {
+        max-height: 200px;
+        overflow-y: auto;
+    }
+    
+    .item-pedido {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f8f9fa;
+    }
+    
+    .item-pedido:last-child {
+        border-bottom: none;
+    }
+    
+    .item-imagem {
+        width: 60px;
+        height: 60px;
+        border-radius: 8px;
+        object-fit: cover;
+        margin-right: 1rem;
+    }
+    
+    .item-info {
+        flex: 1;
+    }
+    
+    .item-nome {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.25rem;
+        font-size: 0.9rem;
+    }
+    
+    .item-detalhes {
+        color: #6c757d;
+        font-size: 0.8rem;
+    }
+    
+    .item-preco {
+        font-weight: 600;
+        color: #ff6b9d;
+        text-align: right;
+    }
+    
+    .btn-detalhe {
+        background: linear-gradient(45deg, #ff6b9d, #c471ed);
+        color: white;
+        border: none;
+        border-radius: 25px;
+        padding: 0.5rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-detalhe:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(255, 107, 157, 0.3);
+        color: white;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 5rem 2rem;
+        color: #6c757d;
+    }
+    
+    .empty-state i {
+        font-size: 5rem;
+        margin-bottom: 2rem;
+        opacity: 0.3;
+    }
+    
+    .empty-state h3 {
+        margin-bottom: 1rem;
+        color: #495057;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(45deg, #ff6b9d, #c471ed);
+        border: none;
+        border-radius: 25px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(255, 107, 157, 0.3);
+    }
+    
+    .breadcrumb {
+        background: none;
+        padding: 0;
+        margin-bottom: 2rem;
+    }
+    
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+        color: #ff6b9d;
+    }
+    
+    .breadcrumb-item a {
+        color: #ff6b9d;
+        text-decoration: none;
+    }
+    
+    .breadcrumb-item a:hover {
+        text-decoration: underline;
+    }
+    
+    .breadcrumb-item.active {
+        color: #6c757d;
+    }
+    
+    .pagination {
+        justify-content: center;
+        margin-top: 3rem;
+    }
+    
+    .page-link {
+        color: #ff6b9d;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        margin: 0 2px;
+    }
+    
+    .page-link:hover {
+        color: white;
+        background: linear-gradient(45deg, #ff6b9d, #c471ed);
+        border-color: #ff6b9d;
+    }
+    
+    .page-item.active .page-link {
+        background: linear-gradient(45deg, #ff6b9d, #c471ed);
+        border-color: #ff6b9d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pedidos-container">
+    <div class="container">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Início</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'usuarios:perfil' %}">Meu Perfil</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Meus Pedidos</li>
+            </ol>
+        </nav>
+        
+        <!-- Header da Página -->
+        <div class="page-header">
+            <h1><i class="fas fa-shopping-bag me-3"></i>Meus Pedidos</h1>
+            <p>Acompanhe todos os seus pedidos e histórico de compras</p>
+        </div>
+        
+        {% if pedidos %}
+            <!-- Estatísticas -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-shopping-cart text-primary fa-2x mb-2"></i>
+                            <h4 class="text-primary">{{ pedidos|length }}</h4>
+                            <small class="text-muted">Total de Pedidos</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-clock text-warning fa-2x mb-2"></i>
+                            <h4 class="text-warning">
+                                {% if pedidos %}
+                                    {{ pedidos|first.data_pedido|date:"M/Y" }}
+                                {% else %}
+                                    --
+                                {% endif %}
+                            </h4>
+                            <small class="text-muted">Último Pedido</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-truck text-info fa-2x mb-2"></i>
+                            <h4 class="text-info">
+                                {% for pedido in pedidos %}
+                                    {% if pedido.status == 'enviado' %}{{ forloop.counter0|add:1 }}{% endif %}
+                                {% empty %}
+                                    0
+                                {% endfor %}
+                            </h4>
+                            <small class="text-muted">Em Trânsito</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-check-circle text-success fa-2x mb-2"></i>
+                            <h4 class="text-success">
+                                {% for pedido in pedidos %}
+                                    {% if pedido.status == 'entregue' %}{{ forloop.counter0|add:1 }}{% endif %}
+                                {% empty %}
+                                    0
+                                {% endfor %}
+                            </h4>
+                            <small class="text-muted">Entregues</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Lista de Pedidos -->
+            {% for pedido in pedidos %}
+                <div class="card pedido-card">
+                    <div class="pedido-header">
+                        <div>
+                            <div class="pedido-numero">Pedido #{{ pedido.numero }}</div>
+                            <div class="pedido-data">
+                                <i class="fas fa-calendar-alt me-2"></i>
+                                {{ pedido.data_pedido|date:"d/m/Y H:i" }}
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="pedido-total mb-2">R$ {{ pedido.total|floatformat:2 }}</div>
+                            <span class="status-badge status-{{ pedido.status|lower }}">
+                                {{ pedido.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h6 class="mb-3">
+                                    <i class="fas fa-box me-2"></i>
+                                    Itens do Pedido ({{ pedido.itens.count }})
+                                </h6>
+                                <div class="pedido-itens">
+                                    {% for item in pedido.itens.all %}
+                                        <div class="item-pedido">
+                                            {% if item.produto.imagem %}
+                                                <img src="{{ item.produto.imagem.url }}" alt="{{ item.produto.nome }}" class="item-imagem">
+                                            {% else %}
+                                                <div class="item-imagem bg-light d-flex align-items-center justify-content-center">
+                                                    <i class="fas fa-image text-muted"></i>
+                                                </div>
+                                            {% endif %}
+                                            
+                                            <div class="item-info">
+                                                <div class="item-nome">{{ item.produto.nome }}</div>
+                                                <div class="item-detalhes">
+                                                    Quantidade: {{ item.quantidade }} | 
+                                                    Tamanho: {{ item.tamanho|default:"P" }} |
+                                                    Cor: {{ item.cor|default:"Padrão" }}
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="item-preco">
+                                                <div>R$ {{ item.preco_unitario|floatformat:2 }}</div>
+                                                <small class="text-muted">un.</small>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <h6 class="mb-3">
+                                    <i class="fas fa-map-marker-alt me-2"></i>
+                                    Endereço de Entrega
+                                </h6>
+                                <div class="text-muted small">
+                                    {% if pedido.endereco_entrega %}
+                                        {{ pedido.endereco_entrega }}
+                                    {% else %}
+                                        {{ user.perfil.endereco }}, {{ user.perfil.numero }}<br>
+                                        {{ user.perfil.bairro }} - {{ user.perfil.cidade }}/{{ user.perfil.estado }}<br>
+                                        CEP: {{ user.perfil.cep }}
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mt-4">
+                                    <h6>
+                                        <i class="fas fa-credit-card me-2"></i>
+                                        Resumo do Pedido
+                                    </h6>
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>Subtotal:</span>
+                                        <span>R$ {{ pedido.subtotal|floatformat:2 }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>Frete:</span>
+                                        <span>R$ {{ pedido.frete|floatformat:2 }}</span>
+                                    </div>
+                                    {% if pedido.desconto %}
+                                        <div class="d-flex justify-content-between mb-1 text-success">
+                                            <span>Desconto:</span>
+                                            <span>- R$ {{ pedido.desconto|floatformat:2 }}</span>
+                                        </div>
+                                    {% endif %}
+                                    <hr>
+                                    <div class="d-flex justify-content-between fw-bold text-primary">
+                                        <span>Total:</span>
+                                        <span>R$ {{ pedido.total|floatformat:2 }}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-4 d-grid">
+                                    <a href="{% url 'pedidos:detalhe' pedido.pk %}" class="btn btn-detalhe">
+                                        <i class="fas fa-eye me-2"></i>Ver Detalhes
+                                    </a>
+                                    
+                                    {% if pedido.status == 'pendente' %}
+                                        <a href="{% url 'pagamentos:processar' pedido.pk %}" class="btn btn-success mt-2">
+                                            <i class="fas fa-credit-card me-2"></i>Pagar Agora
+                                        </a>
+                                    {% endif %}
+                                    
+                                    {% if pedido.status in 'pendente,processando' %}
+                                        <button class="btn btn-outline-danger mt-2" data-bs-toggle="modal" data-bs-target="#cancelarModal{{ pedido.pk }}">
+                                            <i class="fas fa-times me-2"></i>Cancelar Pedido
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Modal de Cancelamento -->
+                {% if pedido.status in 'pendente,processando' %}
+                    <div class="modal fade" id="cancelarModal{{ pedido.pk }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header bg-danger text-white">
+                                    <h5 class="modal-title">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        Cancelar Pedido
+                                    </h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Tem certeza que deseja cancelar o pedido <strong>#{{ pedido.numero }}</strong>?</p>
+                                    <p class="text-muted">Esta ação não poderá ser desfeita.</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                        <i class="fas fa-arrow-left me-2"></i>Voltar
+                                    </button>
+                                    <a href="{% url 'pedidos:cancelar' pedido.pk %}" class="btn btn-danger">
+                                        <i class="fas fa-times me-2"></i>Confirmar Cancelamento
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            
+            <!-- Paginação -->
+            {% if is_paginated %}
+                <nav aria-label="Navegação de pedidos">
+                    <ul class="pagination">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+            
+        {% else %}
+            <!-- Estado Vazio -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="empty-state">
+                        <i class="fas fa-shopping-bag"></i>
+                        <h3>Nenhum pedido encontrado</h3>
+                        <p class="mb-4">Você ainda não fez nenhum pedido. Que tal começar agora?</p>
+                        <a href="{% url 'produtos:lista' %}" class="btn btn-primary">
+                            <i class="fas fa-shopping-cart me-2"></i>
+                            Começar a Comprar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    // Animações de entrada
+    $('.card').each(function(index) {
+        $(this).css('opacity', '0').delay(index * 100).animate({
+            opacity: 1
+        }, 500);
+    });
+    
+    // Auto-ocultar mensagens após 5 segundos
+    setTimeout(function() {
+        $('.alert').fadeOut();
+    }, 5000);
+    
+    // Tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+});
+</script>
+{% endblock %}

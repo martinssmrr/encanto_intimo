@@ -1,0 +1,783 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Meu Perfil - Encanto Íntimo{% endblock %}
+
+{% block extra_css %}
+<!-- Bootstrap 5 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    .perfil-container {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 2rem 0;
+    }
+    
+    .perfil-header {
+        background: linear-gradient(45deg, #ff6b9d, #c471ed);
+        color: white;
+        border-radius: 15px 15px 0 0;
+        padding: 2rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .perfil-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+        animation: float 20s infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
+    }
+    
+    .foto-perfil {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 5px solid white;
+        object-fit: cover;
+        margin: 0 auto 1rem;
+        display: block;
+        position: relative;
+        z-index: 1;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .foto-perfil:hover {
+        transform: scale(1.05);
+    }
+    
+    .foto-default {
+        background: linear-gradient(45deg, #6c757d, #adb5bd);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: white;
+    }
+    
+    .card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        transform: translateY(-2px);
+    }
+    
+    .card-header {
+        background: linear-gradient(45deg, #ff6b9d, #c471ed);
+        color: white;
+        border-radius: 15px 15px 0 0 !important;
+        border: none;
+        padding: 1rem 1.5rem;
+        font-weight: 600;
+    }
+    
+    .info-item {
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #e9ecef;
+        display: flex;
+        align-items: center;
+    }
+    
+    .info-item:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #495057;
+        min-width: 120px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .info-value {
+        color: #6c757d;
+        flex: 1;
+    }
+    
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 10px;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+    
+    .status-pendente { background: #fff3cd; color: #856404; }
+    .status-processando { background: #cce5ff; color: #004085; }
+    .status-enviado { background: #d4edda; color: #155724; }
+    .status-entregue { background: #d1ecf1; color: #0c5460; }
+    .status-cancelado { background: #f8d7da; color: #721c24; }
+    
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #ff6b9d;
+        box-shadow: 0 0 0 0.2rem rgba(255, 107, 157, 0.25);
+    }
+    
+    .btn-primary {
+        background: linear-gradient(45deg, #ff6b9d, #c471ed);
+        border: none;
+        border-radius: 25px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(255, 107, 157, 0.3);
+    }
+    
+    .btn-outline-secondary {
+        border-radius: 25px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline-secondary:hover {
+        transform: translateY(-2px);
+    }
+    
+    .upload-area {
+        border: 2px dashed #dee2e6;
+        border-radius: 10px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .upload-area:hover {
+        border-color: #ff6b9d;
+        background: rgba(255, 107, 157, 0.05);
+    }
+    
+    .upload-area.dragover {
+        border-color: #ff6b9d;
+        background: rgba(255, 107, 157, 0.1);
+    }
+    
+    .pedidos-empty {
+        text-align: center;
+        padding: 3rem;
+        color: #6c757d;
+    }
+    
+    .pedidos-empty i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    
+    .stats-card {
+        background: linear-gradient(45deg, #ff6b9d, #c471ed);
+        color: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+    
+    .stats-number {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    
+    .modal-content {
+        border-radius: 15px;
+        border: none;
+    }
+    
+    .modal-header {
+        background: linear-gradient(45deg, #ff6b9d, #c471ed);
+        color: white;
+        border-radius: 15px 15px 0 0;
+        border: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="perfil-container">
+    <div class="container">
+        <!-- Header do Perfil -->
+        <div class="card">
+            <div class="perfil-header">
+                {% if perfil.foto %}
+                    <img src="{{ perfil.foto.url }}" alt="Foto de {{ usuario.get_full_name }}" class="foto-perfil">
+                {% else %}
+                    <div class="foto-perfil foto-default">
+                        <i class="fas fa-user"></i>
+                    </div>
+                {% endif %}
+                
+                <h2 class="mb-1">{{ usuario.get_full_name|default:usuario.username }}</h2>
+                <p class="mb-0 opacity-75">
+                    <i class="fas fa-envelope me-2"></i>{{ usuario.email }}
+                </p>
+                <small class="opacity-75">
+                    <i class="fas fa-calendar-alt me-2"></i>
+                    Membro desde {{ perfil.data_cadastro|date:"F Y" }}
+                </small>
+            </div>
+            
+            <!-- Estatísticas rápidas -->
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="stats-card">
+                            <div class="stats-number">{{ total_pedidos }}</div>
+                            <div>Pedido{% if total_pedidos != 1 %}s{% endif %} Realizado{% if total_pedidos != 1 %}s{% endif %}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stats-card">
+                            <div class="stats-number">
+                                {% if pedidos_recentes %}
+                                    R$ {{ pedidos_recentes.first.total|floatformat:2 }}
+                                {% else %}
+                                    R$ 0,00
+                                {% endif %}
+                            </div>
+                            <div>Último Pedido</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stats-card">
+                            <div class="stats-number">
+                                {% if perfil.aceita_newsletter %}
+                                    <i class="fas fa-check-circle"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle"></i>
+                                {% endif %}
+                            </div>
+                            <div>Newsletter</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Coluna Esquerda: Informações Pessoais -->
+            <div class="col-lg-8">
+                <!-- Dados Pessoais -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-user me-2"></i>Informações Pessoais
+                        <button class="btn btn-light btn-sm float-end" data-bs-toggle="modal" data-bs-target="#editarPerfilModal">
+                            <i class="fas fa-edit me-1"></i>Editar
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-user text-primary me-2"></i>Nome Completo:
+                            </div>
+                            <div class="info-value">
+                                {{ usuario.get_full_name|default:"Não informado" }}
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-envelope text-primary me-2"></i>E-mail:
+                            </div>
+                            <div class="info-value">{{ usuario.email }}</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-phone text-primary me-2"></i>Telefone:
+                            </div>
+                            <div class="info-value">
+                                {{ perfil.telefone|default:"Não informado" }}
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-birthday-cake text-primary me-2"></i>Data de Nascimento:
+                            </div>
+                            <div class="info-value">
+                                {% if perfil.data_nascimento %}
+                                    {{ perfil.data_nascimento|date:"d/m/Y" }}
+                                {% else %}
+                                    Não informado
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-id-card text-primary me-2"></i>CPF:
+                            </div>
+                            <div class="info-value">
+                                {{ perfil.cpf|default:"Não informado" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Endereço -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-map-marker-alt me-2"></i>Endereço de Entrega
+                    </div>
+                    <div class="card-body">
+                        {% if perfil.endereco %}
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-road text-primary me-2"></i>Endereço:
+                                </div>
+                                <div class="info-value">
+                                    {{ perfil.endereco }}, {{ perfil.numero }}
+                                    {% if perfil.complemento %} - {{ perfil.complemento }}{% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-map text-primary me-2"></i>Bairro:
+                                </div>
+                                <div class="info-value">{{ perfil.bairro }}</div>
+                            </div>
+                            
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-city text-primary me-2"></i>Cidade/Estado:
+                                </div>
+                                <div class="info-value">{{ perfil.cidade }}/{{ perfil.estado }}</div>
+                            </div>
+                            
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-mail-bulk text-primary me-2"></i>CEP:
+                                </div>
+                                <div class="info-value">{{ perfil.cep }}</div>
+                            </div>
+                        {% else %}
+                            <div class="text-center text-muted py-3">
+                                <i class="fas fa-map-marker-alt fa-2x mb-3 opacity-50"></i>
+                                <p>Nenhum endereço cadastrado</p>
+                                <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editarPerfilModal">
+                                    <i class="fas fa-plus me-2"></i>Adicionar Endereço
+                                </button>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Coluna Direita: Pedidos -->
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-shopping-bag me-2"></i>Últimos Pedidos
+                        <a href="{% url 'usuarios:meus_pedidos' %}" class="btn btn-light btn-sm float-end">
+                            <i class="fas fa-eye me-1"></i>Ver Todos
+                        </a>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if pedidos_recentes %}
+                            {% for pedido in pedidos_recentes %}
+                                <div class="p-3 border-bottom">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1">Pedido #{{ pedido.numero }}</h6>
+                                            <small class="text-muted">
+                                                <i class="fas fa-calendar me-1"></i>
+                                                {{ pedido.data_pedido|date:"d/m/Y H:i" }}
+                                            </small>
+                                        </div>
+                                        <span class="status-badge status-{{ pedido.status|lower }}">
+                                            {{ pedido.get_status_display }}
+                                        </span>
+                                    </div>
+                                    <div class="mt-2">
+                                        <strong class="text-primary">R$ {{ pedido.total|floatformat:2 }}</strong>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="pedidos-empty">
+                                <i class="fas fa-shopping-bag"></i>
+                                <h5>Nenhum pedido ainda</h5>
+                                <p class="mb-3">Que tal fazer sua primeira compra?</p>
+                                <a href="{% url 'produtos:lista' %}" class="btn btn-primary">
+                                    <i class="fas fa-shopping-cart me-2"></i>Começar a Comprar
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Card de Preferências -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-cog me-2"></i>Preferências
+                    </div>
+                    <div class="card-body">
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-envelope text-primary me-2"></i>Newsletter:
+                            </div>
+                            <div class="info-value">
+                                {% if perfil.aceita_newsletter %}
+                                    <span class="badge bg-success">Ativada</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Desativada</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-percent text-primary me-2"></i>Promoções:
+                            </div>
+                            <div class="info-value">
+                                {% if perfil.aceita_promocoes %}
+                                    <span class="badge bg-success">Ativadas</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Desativadas</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Edição do Perfil -->
+<div class="modal fade" id="editarPerfilModal" tabindex="-1" aria-labelledby="editarPerfilModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editarPerfilModalLabel">
+                    <i class="fas fa-user-edit me-2"></i>Editar Perfil
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" enctype="multipart/form-data" id="editarPerfilForm">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    
+                    <!-- Seção: Foto de Perfil -->
+                    <div class="mb-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-camera me-2"></i>Foto de Perfil
+                        </h6>
+                        <div class="row align-items-center">
+                            <div class="col-md-4 text-center">
+                                <div id="preview-foto" class="mb-3">
+                                    {% if perfil.foto %}
+                                        <img src="{{ perfil.foto.url }}" alt="Foto atual" class="foto-perfil" style="width: 100px; height: 100px;">
+                                    {% else %}
+                                        <div class="foto-perfil foto-default" style="width: 100px; height: 100px; margin: 0 auto;">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <label for="{{ form.foto.id_for_label }}" class="form-label">{{ form.foto.label }}</label>
+                                {{ form.foto }}
+                                <small class="form-text text-muted">{{ form.foto.help_text }}</small>
+                                {% if form.foto.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.foto.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Seção: Dados Pessoais -->
+                    <div class="mb-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-user me-2"></i>Dados Pessoais
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="{{ form.first_name.id_for_label }}" class="form-label">{{ form.first_name.label }} <span class="text-danger">*</span></label>
+                                {{ form.first_name }}
+                                {% if form.first_name.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.first_name.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.last_name.id_for_label }}" class="form-label">{{ form.last_name.label }} <span class="text-danger">*</span></label>
+                                {{ form.last_name }}
+                                {% if form.last_name.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.last_name.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }} <span class="text-danger">*</span></label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.email.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.telefone.id_for_label }}" class="form-label">{{ form.telefone.label }}</label>
+                                {{ form.telefone }}
+                                {% if form.telefone.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.telefone.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="{{ form.data_nascimento.id_for_label }}" class="form-label">{{ form.data_nascimento.label }}</label>
+                                {{ form.data_nascimento }}
+                                {% if form.data_nascimento.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.data_nascimento.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.cpf.id_for_label }}" class="form-label">{{ form.cpf.label }}</label>
+                                {{ form.cpf }}
+                                {% if form.cpf.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.cpf.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Seção: Endereço -->
+                    <div class="mb-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-map-marker-alt me-2"></i>Endereço
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label for="{{ form.cep.id_for_label }}" class="form-label">{{ form.cep.label }}</label>
+                                {{ form.cep }}
+                                {% if form.cep.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.cep.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.endereco.id_for_label }}" class="form-label">{{ form.endereco.label }}</label>
+                                {{ form.endereco }}
+                                {% if form.endereco.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.endereco.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-2">
+                                <label for="{{ form.numero.id_for_label }}" class="form-label">{{ form.numero.label }}</label>
+                                {{ form.numero }}
+                                {% if form.numero.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.numero.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label for="{{ form.complemento.id_for_label }}" class="form-label">{{ form.complemento.label }}</label>
+                                {{ form.complemento }}
+                                {% if form.complemento.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.complemento.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="{{ form.bairro.id_for_label }}" class="form-label">{{ form.bairro.label }}</label>
+                                {{ form.bairro }}
+                                {% if form.bairro.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.bairro.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="{{ form.cidade.id_for_label }}" class="form-label">{{ form.cidade.label }}</label>
+                                {{ form.cidade }}
+                                {% if form.cidade.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.cidade.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-2">
+                                <label for="{{ form.estado.id_for_label }}" class="form-label">{{ form.estado.label }}</label>
+                                {{ form.estado }}
+                                {% if form.estado.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.estado.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Seção: Preferências -->
+                    <div class="mb-3">
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-cog me-2"></i>Preferências
+                        </h6>
+                        <div class="form-check mb-2">
+                            {{ form.aceita_newsletter }}
+                            <label class="form-check-label" for="{{ form.aceita_newsletter.id_for_label }}">
+                                {{ form.aceita_newsletter.label }}
+                            </label>
+                        </div>
+                        
+                        <div class="form-check">
+                            {{ form.aceita_promocoes }}
+                            <label class="form-check-label" for="{{ form.aceita_promocoes.id_for_label }}">
+                                {{ form.aceita_promocoes.label }}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Salvar Alterações
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    // Máscaras de input
+    $('#telefone').on('input', function() {
+        let value = this.value.replace(/\D/g, '');
+        if (value.length <= 11) {
+            value = value.replace(/^(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+            if (value.length < 14) {
+                value = value.replace(/^(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+            }
+        }
+        this.value = value;
+    });
+    
+    $('#cep').on('input', function() {
+        let value = this.value.replace(/\D/g, '');
+        if (value.length <= 8) {
+            value = value.replace(/^(\d{5})(\d)/, '$1-$2');
+        }
+        this.value = value;
+    });
+    
+    $('#cpf').on('input', function() {
+        let value = this.value.replace(/\D/g, '');
+        if (value.length <= 11) {
+            value = value.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+        }
+        this.value = value;
+    });
+    
+    // Buscar endereço por CEP
+    $('#cep').on('blur', function() {
+        const cep = this.value.replace(/\D/g, '');
+        if (cep.length === 8) {
+            fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.erro) {
+                        $('#{{ form.endereco.id_for_label }}').val(data.logradouro);
+                        $('#{{ form.bairro.id_for_label }}').val(data.bairro);
+                        $('#{{ form.cidade.id_for_label }}').val(data.localidade);
+                        $('#{{ form.estado.id_for_label }}').val(data.uf);
+                    }
+                })
+                .catch(error => console.log('Erro ao buscar CEP:', error));
+        }
+    });
+    
+    // Preview da foto
+    $('#{{ form.foto.id_for_label }}').on('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                $('#preview-foto').html(`
+                    <img src="${e.target.result}" alt="Preview" class="foto-perfil" style="width: 100px; height: 100px;">
+                `);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    
+    // Animações de entrada
+    $('.card').each(function(index) {
+        $(this).css('opacity', '0').delay(index * 100).animate({
+            opacity: 1
+        }, 500);
+    });
+    
+    // Auto-ocultar mensagens após 5 segundos
+    setTimeout(function() {
+        $('.alert').fadeOut();
+    }, 5000);
+});
+</script>
+{% endblock %}

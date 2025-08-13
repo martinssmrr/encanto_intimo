@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+
+{% block title %}Encanto Íntimo - Sua Loja de Produtos Sensuais{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-gradient-to-r from-primary-600 to-primary-800 text-white">
+    <div class="container mx-auto px-4 py-20">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            <div>
+                <h1 class="text-4xl lg:text-6xl font-bold mb-6">
+                    Desperte Seu 
+                    <span class="text-primary-200">Encanto</span>
+                </h1>
+                <p class="text-xl mb-8 text-primary-100">
+                    Descubra nossa coleção exclusiva de produtos íntimos e sensuais. 
+                    Qualidade premium, discrição garantida e entrega rápida.
+                </p>
+                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                    <a href="{% url 'produtos:lista' %}" class="bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-200 text-center">
+                        Ver Produtos
+                    </a>
+                    <a href="#ofertas" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-primary-600 transition duration-200 text-center">
+                        Ofertas Especiais
+                    </a>
+                </div>
+            </div>
+            <div class="text-center">
+                <div class="bg-white bg-opacity-10 rounded-3xl p-8 backdrop-blur-sm">
+                    <i class="fas fa-heart text-6xl text-primary-200 mb-4"></i>
+                    <h3 class="text-2xl font-semibold mb-4">Entrega Discreta</h3>
+                    <p class="text-primary-100">
+                        Embalagem neutra e discreta para sua privacidade total
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="text-center">
+                <div class="bg-primary-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-shield-alt text-2xl text-primary-600"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Pagamento Seguro</h3>
+                <p class="text-gray-600">
+                    Transações protegidas com criptografia SSL e gateways confiáveis
+                </p>
+            </div>
+            <div class="text-center">
+                <div class="bg-primary-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-truck text-2xl text-primary-600"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Frete Grátis</h3>
+                <p class="text-gray-600">
+                    Frete gratuito para compras acima de R$ 199 em todo o Brasil
+                </p>
+            </div>
+            <div class="text-center">
+                <div class="bg-primary-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-undo text-2xl text-primary-600"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Troca Garantida</h3>
+                <p class="text-gray-600">
+                    30 dias para trocar produtos que não ficaram perfeitos
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Products -->
+<section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Produtos em Destaque</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto">
+                Confira nossa seleção especial de produtos mais desejados
+            </p>
+        </div>
+        
+        <!-- Produtos em destaque serão carregados dinamicamente -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Placeholder para produtos -->
+            {% for i in "1234" %}
+            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-200">
+                <div class="h-64 bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center">
+                    <i class="fas fa-heart text-4xl text-primary-600"></i>
+                </div>
+                <div class="p-4">
+                    <h3 class="font-semibold mb-2">Produto em Destaque {{ i }}</h3>
+                    <p class="text-gray-600 text-sm mb-2">Descrição do produto...</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xl font-bold text-primary-600">R$ 99,90</span>
+                        <button class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg text-sm transition">
+                            Comprar
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-8">
+            <a href="{% url 'produtos:lista' %}" class="bg-primary-600 hover:bg-primary-700 text-white px-8 py-3 rounded-lg font-semibold transition duration-200">
+                Ver Todos os Produtos
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Offers Section -->
+<section id="ofertas" class="py-16 bg-primary-600 text-white">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold mb-4">Ofertas Especiais</h2>
+            <p class="text-primary-100 max-w-2xl mx-auto">
+                Aproveite nossas promoções exclusivas e descubra produtos incríveis com preços especiais
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-8">
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-percent text-3xl text-primary-200 mr-4"></i>
+                    <h3 class="text-2xl font-semibold">Desconto de 30%</h3>
+                </div>
+                <p class="text-primary-100 mb-6">
+                    Na primeira compra para novos clientes. Use o cupom PRIMEIRO30
+                </p>
+                <a href="{% url 'usuarios:register' %}" class="bg-white text-primary-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-200 inline-block">
+                    Cadastrar Agora
+                </a>
+            </div>
+            
+            <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-8">
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-gift text-3xl text-primary-200 mr-4"></i>
+                    <h3 class="text-2xl font-semibold">Kit Especial</h3>
+                </div>
+                <p class="text-primary-100 mb-6">
+                    Compre 2 produtos e ganhe um terceiro grátis em itens selecionados
+                </p>
+                <a href="{% url 'produtos:lista' %}" class="bg-white text-primary-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-200 inline-block">
+                    Ver Produtos
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter -->
+<section class="py-16 bg-gray-900 text-white">
+    <div class="container mx-auto px-4 text-center">
+        <h2 class="text-3xl font-bold mb-4">Fique por Dentro das Novidades</h2>
+        <p class="text-gray-300 mb-8 max-w-2xl mx-auto">
+            Cadastre-se em nossa newsletter e receba ofertas exclusivas, novos produtos e dicas especiais
+        </p>
+        
+        <form class="max-w-md mx-auto flex">
+            <input 
+                type="email" 
+                placeholder="Seu melhor e-mail" 
+                class="flex-1 px-4 py-3 bg-gray-800 border border-gray-600 rounded-l-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                required
+            >
+            <button type="submit" class="bg-primary-600 hover:bg-primary-700 px-6 py-3 rounded-r-lg font-semibold transition duration-200">
+                Cadastrar
+            </button>
+        </form>
+        
+        <p class="text-gray-400 text-sm mt-4">
+            Prometemos não enviar spam. Você pode cancelar a qualquer momento.
+        </p>
+    </div>
+</section>
+{% endblock %}

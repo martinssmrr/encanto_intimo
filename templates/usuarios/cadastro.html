@@ -1,0 +1,570 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cadastro - Encanto Íntimo{% endblock %}
+
+{% block extra_css %}
+<!-- Bootstrap 5 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    .cadastro-container {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #ff6b9d 0%, #c471ed 100%);
+        padding: 2rem 0;
+    }
+    
+    .cadastro-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin: 2rem auto;
+        max-width: 900px;
+    }
+    
+    .cadastro-header {
+        background: linear-gradient(45deg, #ff6b9d, #c471ed);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .cadastro-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 10px;
+        padding: 12px 15px;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #ff6b9d;
+        box-shadow: 0 0 0 0.2rem rgba(255, 107, 157, 0.25);
+    }
+    
+    .btn-primary {
+        background: linear-gradient(45deg, #ff6b9d, #c471ed);
+        border: none;
+        padding: 15px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(255, 107, 157, 0.3);
+    }
+    
+    .form-section {
+        border-left: 4px solid #ff6b9d;
+        padding-left: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .form-section h5 {
+        color: #ff6b9d;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    
+    .form-check-input:checked {
+        background-color: #ff6b9d;
+        border-color: #ff6b9d;
+    }
+    
+    .invalid-feedback {
+        display: block;
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    
+    .password-strength {
+        padding: 0.5rem;
+        border-radius: 5px;
+        margin-top: 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    .strength-weak { background: #f8d7da; color: #721c24; }
+    .strength-medium { background: #fff3cd; color: #856404; }
+    .strength-strong { background: #d4edda; color: #155724; }
+    
+    .loading-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 9999;
+    }
+    
+    .loading-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="cadastro-container">
+    <div class="container">
+        <div class="cadastro-card">
+            <!-- Header -->
+            <div class="cadastro-header">
+                <div class="cadastro-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <h2 class="mb-0">Junte-se ao Encanto Íntimo</h2>
+                <p class="mb-0">Crie sua conta e descubra um mundo de prazer e bem-estar</p>
+            </div>
+            
+            <!-- Formulário -->
+            <div class="row g-0">
+                <div class="col-lg-8">
+                    <div class="p-4">
+                        <form method="post" id="cadastro-form" novalidate>
+                            {% csrf_token %}
+                            
+                            <!-- Mensagens de erro gerais -->
+                            {% if form.non_field_errors %}
+                                <div class="alert alert-danger" role="alert">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    {% for error in form.non_field_errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Seção: Dados Pessoais -->
+                            <div class="form-section">
+                                <h5><i class="fas fa-user me-2"></i>Dados Pessoais</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                                            {{ form.first_name.label }} <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.first_name }}
+                                        {% if form.first_name.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.first_name.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                                            {{ form.last_name.label }} <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.last_name }}
+                                        {% if form.last_name.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.last_name.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="{{ form.email.id_for_label }}" class="form-label">
+                                            {{ form.email.label }} <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.email }}
+                                        {% if form.email.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.email.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="{{ form.telefone.id_for_label }}" class="form-label">
+                                            {{ form.telefone.label }} <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.telefone }}
+                                        {% if form.telefone.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.telefone.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Seção: Acesso -->
+                            <div class="form-section">
+                                <h5><i class="fas fa-key me-2"></i>Dados de Acesso</h5>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <label for="{{ form.username.id_for_label }}" class="form-label">
+                                            {{ form.username.label }} <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.username }}
+                                        <small class="form-text text-muted">{{ form.username.help_text }}</small>
+                                        {% if form.username.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.username.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="{{ form.password1.id_for_label }}" class="form-label">
+                                            {{ form.password1.label }} <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.password1 }}
+                                        <div id="password-strength" class="password-strength" style="display: none;"></div>
+                                        <small class="form-text text-muted">{{ form.password1.help_text }}</small>
+                                        {% if form.password1.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.password1.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="{{ form.password2.id_for_label }}" class="form-label">
+                                            {{ form.password2.label }} <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.password2 }}
+                                        {% if form.password2.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.password2.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Seção: Endereço -->
+                            <div class="form-section">
+                                <h5><i class="fas fa-map-marker-alt me-2"></i>Endereço de Entrega</h5>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label for="{{ form.cep.id_for_label }}" class="form-label">
+                                            {{ form.cep.label }} <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.cep }}
+                                        {% if form.cep.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.cep.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="{{ form.endereco.id_for_label }}" class="form-label">
+                                            {{ form.endereco.label }} <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.endereco }}
+                                        {% if form.endereco.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.endereco.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="{{ form.numero.id_for_label }}" class="form-label">
+                                            {{ form.numero.label }} <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.numero }}
+                                        {% if form.numero.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.numero.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label for="{{ form.complemento.id_for_label }}" class="form-label">
+                                            {{ form.complemento.label }}
+                                        </label>
+                                        {{ form.complemento }}
+                                        {% if form.complemento.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.complemento.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="{{ form.bairro.id_for_label }}" class="form-label">
+                                            {{ form.bairro.label }} <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.bairro }}
+                                        {% if form.bairro.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.bairro.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="{{ form.cidade.id_for_label }}" class="form-label">
+                                            {{ form.cidade.label }} <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.cidade }}
+                                        {% if form.cidade.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.cidade.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label for="{{ form.estado.id_for_label }}" class="form-label">
+                                            {{ form.estado.label }} <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.estado }}
+                                        {% if form.estado.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.estado.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Seção: Preferências -->
+                            <div class="form-section">
+                                <h5><i class="fas fa-cog me-2"></i>Preferências</h5>
+                                <div class="form-check mb-3">
+                                    {{ form.aceita_termos }}
+                                    <label class="form-check-label" for="{{ form.aceita_termos.id_for_label }}">
+                                        {{ form.aceita_termos.label }} <span class="text-danger">*</span>
+                                    </label>
+                                    {% if form.aceita_termos.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.aceita_termos.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="form-check">
+                                    {{ form.aceita_newsletter }}
+                                    <label class="form-check-label" for="{{ form.aceita_newsletter.id_for_label }}">
+                                        {{ form.aceita_newsletter.label }}
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Botão de Envio -->
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary btn-lg" id="btn-cadastrar">
+                                    <i class="fas fa-user-plus me-2"></i>
+                                    Criar Minha Conta
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Sidebar com Informações -->
+                <div class="col-lg-4">
+                    <div class="p-4 bg-light h-100">
+                        <h5 class="text-primary mb-4">
+                            <i class="fas fa-gift me-2"></i>
+                            Vantagens de se cadastrar
+                        </h5>
+                        
+                        <div class="mb-3">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-shipping-fast text-primary me-3 mt-1"></i>
+                                <div>
+                                    <h6 class="mb-1">Frete Grátis</h6>
+                                    <small class="text-muted">Em compras acima de R$ 199</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-percent text-primary me-3 mt-1"></i>
+                                <div>
+                                    <h6 class="mb-1">Ofertas Exclusivas</h6>
+                                    <small class="text-muted">Descontos especiais para clientes</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-heart text-primary me-3 mt-1"></i>
+                                <div>
+                                    <h6 class="mb-1">Lista de Desejos</h6>
+                                    <small class="text-muted">Salve seus produtos favoritos</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-shield-alt text-primary me-3 mt-1"></i>
+                                <div>
+                                    <h6 class="mb-1">Compra Segura</h6>
+                                    <small class="text-muted">Seus dados protegidos</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-undo text-primary me-3 mt-1"></i>
+                                <div>
+                                    <h6 class="mb-1">Trocas Fáceis</h6>
+                                    <small class="text-muted">7 dias para trocas</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="text-center">
+                            <p class="mb-2"><strong>Já tem uma conta?</strong></p>
+                            <a href="{% url 'usuarios:login' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-sign-in-alt me-2"></i>
+                                Fazer Login
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loading-overlay">
+    <div class="loading-content">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Carregando...</span>
+        </div>
+        <p class="mt-3 mb-0">Criando sua conta...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    // Máscaras de input
+    $('#telefone').on('input', function() {
+        let value = this.value.replace(/\D/g, '');
+        if (value.length <= 11) {
+            value = value.replace(/^(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+            if (value.length < 14) {
+                value = value.replace(/^(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+            }
+        }
+        this.value = value;
+    });
+    
+    $('#cep').on('input', function() {
+        let value = this.value.replace(/\D/g, '');
+        if (value.length <= 8) {
+            value = value.replace(/^(\d{5})(\d)/, '$1-$2');
+        }
+        this.value = value;
+    });
+    
+    // Buscar endereço por CEP
+    $('#cep').on('blur', function() {
+        const cep = this.value.replace(/\D/g, '');
+        if (cep.length === 8) {
+            fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.erro) {
+                        $('#{{ form.endereco.id_for_label }}').val(data.logradouro);
+                        $('#{{ form.bairro.id_for_label }}').val(data.bairro);
+                        $('#{{ form.cidade.id_for_label }}').val(data.localidade);
+                        $('#{{ form.estado.id_for_label }}').val(data.uf);
+                    }
+                })
+                .catch(error => console.log('Erro ao buscar CEP:', error));
+        }
+    });
+    
+    // Verificador de força da senha
+    $('#{{ form.password1.id_for_label }}').on('input', function() {
+        const password = this.value;
+        const strengthDiv = $('#password-strength');
+        
+        if (password.length === 0) {
+            strengthDiv.hide();
+            return;
+        }
+        
+        let strength = 0;
+        let message = '';
+        
+        if (password.length >= 8) strength++;
+        if (/[a-z]/.test(password)) strength++;
+        if (/[A-Z]/.test(password)) strength++;
+        if (/\d/.test(password)) strength++;
+        if (/[^A-Za-z0-9]/.test(password)) strength++;
+        
+        strengthDiv.removeClass('strength-weak strength-medium strength-strong');
+        
+        if (strength < 3) {
+            strengthDiv.addClass('strength-weak');
+            message = '🔴 Senha fraca - Adicione mais caracteres, números ou símbolos';
+        } else if (strength < 4) {
+            strengthDiv.addClass('strength-medium');
+            message = '🟡 Senha média - Boa, mas pode melhorar';
+        } else {
+            strengthDiv.addClass('strength-strong');
+            message = '🟢 Senha forte - Excelente!';
+        }
+        
+        strengthDiv.text(message).show();
+    });
+    
+    // Validação em tempo real
+    $('#{{ form.password2.id_for_label }}').on('input', function() {
+        const password1 = $('#{{ form.password1.id_for_label }}').val();
+        const password2 = this.value;
+        
+        if (password2.length > 0) {
+            if (password1 === password2) {
+                $(this).removeClass('is-invalid').addClass('is-valid');
+            } else {
+                $(this).removeClass('is-valid').addClass('is-invalid');
+            }
+        }
+    });
+    
+    // Submit do formulário
+    $('#cadastro-form').on('submit', function(e) {
+        // Mostrar loading
+        $('#loading-overlay').show();
+        $('#btn-cadastrar').prop('disabled', true);
+        
+        // Permitir submit normal
+        return true;
+    });
+    
+    // Animação de entrada
+    $('.cadastro-card').hide().fadeIn(800);
+});
+</script>
+{% endblock %}

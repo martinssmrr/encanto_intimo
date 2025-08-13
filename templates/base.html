@@ -1,0 +1,319 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Encanto Íntimo - Sua Loja de Produtos Sensuais{% endblock %}</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="{% block meta_description %}Encanto Íntimo - A melhor loja online de produtos íntimos e sensuais. Qualidade, discrição e entrega rápida.{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}lingerie, produtos íntimos, sensuais, loja online, dropshipping{% endblock %}">
+    
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#fdf2f8',
+                            100: '#fce7f3',
+                            200: '#fbcfe8',
+                            300: '#f9a8d4',
+                            400: '#f472b6',
+                            500: '#ec4899',
+                            600: '#db2777',
+                            700: '#be185d',
+                            800: '#9d174d',
+                            900: '#831843',
+                        },
+                        secondary: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <!-- Top Bar -->
+            <div class="border-b border-gray-200 py-2">
+                <div class="flex justify-between items-center text-sm">
+                    <div class="flex items-center space-x-4">
+                        <span class="text-gray-600">
+                            <i class="fas fa-truck mr-1"></i>
+                            Frete grátis acima de R$ 199
+                        </span>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'usuarios:perfil' %}" class="text-gray-600 hover:text-primary-600">
+                                <i class="fas fa-user mr-1"></i>
+                                Olá, {{ user.first_name|default:user.username }}
+                            </a>
+                            <a href="{% url 'usuarios:logout' %}" class="text-gray-600 hover:text-primary-600">
+                                <i class="fas fa-sign-out-alt mr-1"></i>
+                                Sair
+                            </a>
+                        {% else %}
+                            <a href="{% url 'usuarios:login' %}" class="text-gray-600 hover:text-primary-600">
+                                <i class="fas fa-sign-in-alt mr-1"></i>
+                                Entrar
+                            </a>
+                            <a href="{% url 'usuarios:register' %}" class="text-gray-600 hover:text-primary-600">
+                                <i class="fas fa-user-plus mr-1"></i>
+                                Cadastrar
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Header -->
+            <div class="flex items-center justify-between py-4">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="{% url 'home' %}" class="text-2xl font-bold text-primary-600">
+                        <i class="fas fa-heart mr-2"></i>
+                        Encanto Íntimo
+                    </a>
+                </div>
+                
+                <!-- Search Bar -->
+                <div class="flex-1 max-w-lg mx-8">
+                    <form method="GET" action="{% url 'produtos:buscar' %}" class="relative">
+                        <input 
+                            type="text" 
+                            name="q" 
+                            placeholder="Buscar produtos..." 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            value="{{ request.GET.q }}"
+                        >
+                        <button type="submit" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-primary-600">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Cart -->
+                <div class="flex items-center">
+                    <a href="{% url 'carrinho:visualizar' %}" class="relative bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg transition duration-200">
+                        <i class="fas fa-shopping-cart mr-2"></i>
+                        Carrinho
+                        {% if carrinho_total_itens > 0 %}
+                            <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center">
+                                {{ carrinho_total_itens }}
+                            </span>
+                        {% endif %}
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Navigation -->
+        <nav class="bg-primary-600 text-white">
+            <div class="container mx-auto px-4">
+                <div class="flex items-center space-x-8 py-3">
+                    <a href="{% url 'home' %}" class="hover:text-primary-200 transition">Início</a>
+                    <div class="relative group">
+                        <button class="hover:text-primary-200 transition flex items-center">
+                            Categorias
+                            <i class="fas fa-chevron-down ml-1"></i>
+                        </button>
+                        <!-- Dropdown será implementado posteriormente -->
+                    </div>
+                    <a href="{% url 'produtos:lista' %}" class="hover:text-primary-200 transition">Todos os Produtos</a>
+                    <a href="#" class="hover:text-primary-200 transition">Ofertas</a>
+                    <a href="#" class="hover:text-primary-200 transition">Contato</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="container mx-auto px-4 py-4">
+            {% for message in messages %}
+                {% if message.tags == 'error' %}
+                    <div class="alert alert-error bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 relative">
+                        <i class="fas fa-exclamation-circle mr-2"></i>
+                        {{ message }}
+                        <button type="button" class="absolute top-3 right-3 text-red-500 hover:text-red-700" onclick="this.parentElement.style.display='none'">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                {% elif message.tags == 'success' %}
+                    <div class="alert alert-success bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 relative">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        {{ message }}
+                        <button type="button" class="absolute top-3 right-3 text-green-500 hover:text-green-700" onclick="this.parentElement.style.display='none'">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                {% elif message.tags == 'warning' %}
+                    <div class="alert alert-warning bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4 relative">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        {{ message }}
+                        <button type="button" class="absolute top-3 right-3 text-yellow-500 hover:text-yellow-700" onclick="this.parentElement.style.display='none'">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                {% elif message.tags == 'info' %}
+                    <div class="alert alert-info bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded mb-4 relative">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        {{ message }}
+                        <button type="button" class="absolute top-3 right-3 text-blue-500 hover:text-blue-700" onclick="this.parentElement.style.display='none'">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                {% else %}
+                    <div class="alert alert-default bg-gray-100 border border-gray-400 text-gray-700 px-4 py-3 rounded mb-4 relative">
+                        {{ message }}
+                        <button type="button" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700" onclick="this.parentElement.style.display='none'">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white mt-16">
+        <div class="container mx-auto px-4 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- About -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Encanto Íntimo</h3>
+                    <p class="text-gray-300 text-sm">
+                        Sua loja online de produtos íntimos e sensuais. 
+                        Qualidade, discrição e entrega rápida em todo o Brasil.
+                    </p>
+                </div>
+                
+                <!-- Links -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Links Úteis</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-300 hover:text-white">Sobre Nós</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Política de Privacidade</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Termos de Uso</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Devolução e Troca</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Customer Service -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Atendimento</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li class="text-gray-300">
+                            <i class="fas fa-envelope mr-2"></i>
+                            contato@encantointimo.com
+                        </li>
+                        <li class="text-gray-300">
+                            <i class="fas fa-phone mr-2"></i>
+                            (11) 99999-9999
+                        </li>
+                        <li class="text-gray-300">
+                            <i class="fas fa-clock mr-2"></i>
+                            Seg à Sex: 9h às 18h
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Newsletter -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Newsletter</h3>
+                    <p class="text-gray-300 text-sm mb-4">
+                        Receba ofertas exclusivas e novidades
+                    </p>
+                    <form class="flex">
+                        <input 
+                            type="email" 
+                            placeholder="Seu e-mail" 
+                            class="flex-1 px-3 py-2 bg-gray-800 border border-gray-600 rounded-l-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        >
+                        <button type="submit" class="bg-primary-600 hover:bg-primary-700 px-4 py-2 rounded-r-lg transition">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Copyright -->
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center">
+                <p class="text-gray-400 text-sm">
+                    © {{ "now"|date:"Y" }} Encanto Íntimo. Todos os direitos reservados.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
+    <!-- URLs para JavaScript -->
+    <script>
+        window.urls = {
+            calcular_frete: "{% url 'carrinho:calcular_frete' %}",
+            limpar_carrinho: "{% url 'carrinho:limpar' %}",
+            finalizar_compra: "{% url 'carrinho:finalizar' %}"
+        };
+    </script>
+    
+    <!-- Carrinho JavaScript -->
+    <script src="{% static 'js/carrinho.js' %}"></script>
+    
+    <script>
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+        
+        // Close alerts
+        document.querySelectorAll('.alert').forEach(alert => {
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
