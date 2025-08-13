@@ -31,8 +31,7 @@ DATABASES = {
         "PORT": config('DB_PORT', default='3306'),
         "OPTIONS": {
             'charset': 'utf8mb4',
-            'sql_mode': 'STRICT_TRANS_TABLES',
-            'init_command': "SET innodb_strict_mode=1",
+            # Configurações mínimas para desenvolvimento
         },
         'CONN_MAX_AGE': 60,
         'CONN_HEALTH_CHECKS': True,

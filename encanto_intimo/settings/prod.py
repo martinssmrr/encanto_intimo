@@ -35,11 +35,9 @@ DATABASES = {
         'PORT': config('DB_PORT', default='3306'),
         'OPTIONS': {
             'charset': 'utf8mb4',
-            'sql_mode': 'STRICT_TRANS_TABLES',
-            'init_command': "SET innodb_strict_mode=1",
-            'ssl': config('DB_SSL_ENABLED', default=True, cast=bool),
+            # Configurações SSL apenas em produção
+            'ssl': config('DB_SSL_ENABLED', default=False, cast=bool),
             'ssl_ca': config('DB_SSL_CA', default=None),
-            'autocommit': True,
         },
         'CONN_MAX_AGE': config('DB_CONN_MAX_AGE', default=300, cast=int),  # 5 minutos para produção
         'CONN_HEALTH_CHECKS': True,

@@ -87,24 +87,35 @@ WSGI_APPLICATION = "encanto_intimo.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-# Configuração base do MySQL (pode ser sobrescrita nos ambientes específicos)
-DATABASES = {
-    'default': {
-        'ENGINE': config('DB_ENGINE', default='django.db.backends.mysql'),
-        'NAME': config('DB_NAME', default='db_encanto'),
-        'USER': config('DB_USER', default='encanto_admin'),
-        'PASSWORD': config('DB_PASSWORD', default=''),
-        'HOST': config('DB_HOST', default='localhost'),
-        'PORT': config('DB_PORT', default='3306'),
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-            'sql_mode': 'STRICT_TRANS_TABLES',
-            'init_command': "SET innodb_strict_mode=1",
-        },
-        'CONN_MAX_AGE': config('DB_CONN_MAX_AGE', default=60, cast=int),
-        'CONN_HEALTH_CHECKS': True,
+# Configuração flexível: MySQL ou SQLite dependendo do .env
+db_engine = config('DB_ENGINE', default='django.db.backends.sqlite3')
+
+if db_engine == 'django.db.backends.sqlite3':
+    # Configuração SQLite (desenvolvimento/fallback)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / config('DB_NAME', default='db.sqlite3'),
+        }
     }
-}
+else:
+    # Configuração MySQL (produção/quando configurado)
+    DATABASES = {
+        'default': {
+            'ENGINE': config('DB_ENGINE', default='django.db.backends.mysql'),
+            'NAME': config('DB_NAME', default='db_encanto'),
+            'USER': config('DB_USER', default='encanto_admin'),
+            'PASSWORD': config('DB_PASSWORD', default=''),
+            'HOST': config('DB_HOST', default='localhost'),
+            'PORT': config('DB_PORT', default='3306'),
+            'OPTIONS': {
+                'charset': 'utf8mb4',
+                # Configurações mínimas para evitar erros de privilégios
+            },
+            'CONN_MAX_AGE': config('DB_CONN_MAX_AGE', default=60, cast=int),
+            'CONN_HEALTH_CHECKS': True,
+        }
+    }
 
 
 # Password validation
@@ -249,13 +260,13 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-# Configurações do django-allauth (versão atualizada)
+# Configurações do django-allauth (sintaxe correta e atualizada)
 ACCOUNT_EMAIL_VERIFICATION = 'optional'  # 'mandatory', 'optional' ou 'none'
 ACCOUNT_UNIQUE_EMAIL = True
 
-# Nova sintaxe para campos de signup e métodos de login
-ACCOUNT_SIGNUP_FIELDS = ['email']  # Apenas email é obrigatório
+# Configurações atualizadas compatíveis
 ACCOUNT_LOGIN_METHODS = {'email'}  # Login apenas com email
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']  # Campos obrigatórios
 
 # Nova sintaxe para rate limiting
 ACCOUNT_RATE_LIMITS = {

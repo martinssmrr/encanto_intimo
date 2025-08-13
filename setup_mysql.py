@@ -60,15 +60,22 @@ def criar_banco_e_usuario(connection):
         print(f"🏗️ Configurando banco: {db_name}")
         print(f"👤 Usuário: {db_user}")
         
-        # Criar banco de dados
-        cursor.execute(f"CREATE DATABASE IF NOT EXISTS {db_name} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;")
+        # Criar banco de dados com charset correto
+        cursor.execute(f"""
+            CREATE DATABASE IF NOT EXISTS {db_name} 
+            CHARACTER SET utf8mb4 
+            COLLATE utf8mb4_unicode_ci
+        """)
         print(f"✅ Banco de dados '{db_name}' criado/verificado")
         
-        # Criar usuário
-        cursor.execute(f"CREATE USER IF NOT EXISTS '{db_user}'@'{db_host}' IDENTIFIED BY '{db_password}';")
+        # Criar usuário se não existir
+        cursor.execute(f"""
+            CREATE USER IF NOT EXISTS '{db_user}'@'{db_host}' 
+            IDENTIFIED BY '{db_password}'
+        """)
         print(f"✅ Usuário '{db_user}' criado/verificado")
         
-        # Conceder privilégios
+        # Conceder privilégios necessários (sem SYSTEM_VARIABLES_ADMIN)
         cursor.execute(f"GRANT ALL PRIVILEGES ON {db_name}.* TO '{db_user}'@'{db_host}';")
         cursor.execute("FLUSH PRIVILEGES;")
         print(f"✅ Privilégios concedidos ao usuário '{db_user}'")
