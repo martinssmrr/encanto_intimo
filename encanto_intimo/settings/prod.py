@@ -24,19 +24,25 @@ ALLOWED_HOSTS = config(
 )
 
 # Database para produção
-# PostgreSQL é recomendado para produção
+# MySQL configurado para produção com otimizações
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': config('DB_ENGINE', default='django.db.backends.mysql'),
         'NAME': config('DB_NAME'),
         'USER': config('DB_USER'),
         'PASSWORD': config('DB_PASSWORD'),
         'HOST': config('DB_HOST', default='localhost'),
-        'PORT': config('DB_PORT', default='5432'),
+        'PORT': config('DB_PORT', default='3306'),
         'OPTIONS': {
-            'sslmode': 'require',
+            'charset': 'utf8mb4',
+            'sql_mode': 'STRICT_TRANS_TABLES',
+            'init_command': "SET innodb_strict_mode=1",
+            'ssl': config('DB_SSL_ENABLED', default=True, cast=bool),
+            'ssl_ca': config('DB_SSL_CA', default=None),
+            'autocommit': True,
         },
-        'CONN_MAX_AGE': 60,  # Conexões persistentes
+        'CONN_MAX_AGE': config('DB_CONN_MAX_AGE', default=300, cast=int),  # 5 minutos para produção
+        'CONN_HEALTH_CHECKS': True,
     }
 }
 

@@ -3,7 +3,8 @@ Django>=5.2,<6.0
 python-decouple>=3.8
 
 # === DATABASE ===
-psycopg2-binary>=2.9.7  # PostgreSQL para produção
+mysqlclient>=2.2.0  # MySQL connector para Django
+psycopg2-binary>=2.9.7  # PostgreSQL para produção (mantido como alternativa)
 
 # === CACHE ===
 redis>=5.0.0
