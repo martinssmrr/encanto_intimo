@@ -87,35 +87,23 @@ WSGI_APPLICATION = "encanto_intimo.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-# Configuração flexível: MySQL ou SQLite dependendo do .env
-db_engine = config('DB_ENGINE', default='django.db.backends.sqlite3')
-
-if db_engine == 'django.db.backends.sqlite3':
-    # Configuração SQLite (desenvolvimento/fallback)
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / config('DB_NAME', default='db.sqlite3'),
-        }
+# Configuração base MySQL - será sobrescrita nos ambientes específicos
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': config('DB_NAME', default='db_encanto'),
+        'USER': config('DB_USER', default='encanto_admin'),
+        'PASSWORD': config('DB_PASSWORD', default=''),
+        'HOST': config('DB_HOST', default='localhost'),
+        'PORT': config('DB_PORT', default='3306'),
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
+        'CONN_MAX_AGE': 60,
+        'CONN_HEALTH_CHECKS': True,
     }
-else:
-    # Configuração MySQL (produção/quando configurado)
-    DATABASES = {
-        'default': {
-            'ENGINE': config('DB_ENGINE', default='django.db.backends.mysql'),
-            'NAME': config('DB_NAME', default='db_encanto'),
-            'USER': config('DB_USER', default='encanto_admin'),
-            'PASSWORD': config('DB_PASSWORD', default=''),
-            'HOST': config('DB_HOST', default='localhost'),
-            'PORT': config('DB_PORT', default='3306'),
-            'OPTIONS': {
-                'charset': 'utf8mb4',
-                # Configurações mínimas para evitar erros de privilégios
-            },
-            'CONN_MAX_AGE': config('DB_CONN_MAX_AGE', default=60, cast=int),
-            'CONN_HEALTH_CHECKS': True,
-        }
-    }
+}
 
 
 # Password validation

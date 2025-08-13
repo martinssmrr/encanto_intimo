@@ -20,10 +20,10 @@ ALLOWED_HOSTS = [
 ]
 
 # Database para desenvolvimento
-# MySQL configurado para desenvolvimento local
+# MySQL local para desenvolvimento
 DATABASES = {
     "default": {
-        "ENGINE": config('DB_ENGINE', default='django.db.backends.mysql'),
+        "ENGINE": "django.db.backends.mysql",
         "NAME": config('DB_NAME', default='db_encanto'),
         "USER": config('DB_USER', default='encanto_admin'),
         "PASSWORD": config('DB_PASSWORD', default=''),
@@ -31,7 +31,7 @@ DATABASES = {
         "PORT": config('DB_PORT', default='3306'),
         "OPTIONS": {
             'charset': 'utf8mb4',
-            # Configurações mínimas para desenvolvimento
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
         },
         'CONN_MAX_AGE': 60,
         'CONN_HEALTH_CHECKS': True,
@@ -131,6 +131,6 @@ TEMPLATES[0]['OPTIONS']['debug'] = True
 
 print("🚀 Executando em modo DESENVOLVIMENTO")
 print(f"📁 BASE_DIR: {BASE_DIR}")
-print(f"🗄️  Database: SQLite (db.sqlite3)")
+print(f"🗄️  Database: MySQL ({config('DB_NAME', default='db_encanto')}@{config('DB_HOST', default='localhost')})")
 print(f"📧 Email: Console Backend")
 print(f"🔧 Debug: {DEBUG}")
