@@ -27,6 +27,16 @@ class Pedido(models.Model):
     numero_pedido = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pedidos', verbose_name="Usuário")
     
+    # Relacionamento com Cliente (será adicionado após migração)
+    # cliente = models.ForeignKey(
+    #     'clientes.Cliente', 
+    #     on_delete=models.CASCADE, 
+    #     related_name='pedidos', 
+    #     verbose_name="Cliente",
+    #     null=True,
+    #     blank=True
+    # )
+    
     # Status e datas
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pendente', verbose_name="Status")
     data_pedido = models.DateTimeField(auto_now_add=True, verbose_name="Data do Pedido")

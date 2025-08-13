@@ -1,0 +1,214 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}Painel Admin - Encanto Íntimo{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    
+<h1 style="color: #1F2937; margin-bottom: 30px; font-size: 28px;">
+    👗 Painel Administrativo - Encanto Íntimo
+</h1>
+
+{{ block.super }}
+
+<!-- Dashboard de estatísticas -->
+<div class="dashboard-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+    
+    <!-- Card: Total de Pedidos -->
+    <div class="dashboard-card">
+        <h3>📦 Total de Pedidos</h3>
+        <div class="dashboard-number" id="total-pedidos">{{ total_pedidos|default:0 }}</div>
+        <div class="dashboard-label">pedidos registrados</div>
+        <div style="margin-top: 10px;">
+            <a href="{% url 'admin:pedidos_pedido_changelist' %}" class="button" style="font-size: 12px; padding: 5px 10px;">
+                Ver todos
+            </a>
+        </div>
+    </div>
+    
+    <!-- Card: Pedidos Pendentes -->
+    <div class="dashboard-card">
+        <h3>⏳ Pedidos Pendentes</h3>
+        <div class="dashboard-number" style="color: #f59e0b;" id="pedidos-pendentes">{{ pedidos_pendentes|default:0 }}</div>
+        <div class="dashboard-label">aguardando confirmação</div>
+        <div style="margin-top: 10px;">
+            <a href="{% url 'admin:pedidos_pedido_changelist' %}?status=pendente" class="button" style="font-size: 12px; padding: 5px 10px;">
+                Verificar
+            </a>
+        </div>
+    </div>
+    
+    <!-- Card: Total de Clientes -->
+    <div class="dashboard-card">
+        <h3>👥 Total de Usuários</h3>
+        <div class="dashboard-number" style="color: #059669;" id="total-clientes">{{ total_clientes|default:0 }}</div>
+        <div class="dashboard-label">usuários cadastrados</div>
+        <div style="margin-top: 10px;">
+            <a href="{% url 'admin:auth_user_changelist' %}" class="button" style="font-size: 12px; padding: 5px 10px;">
+                Gerenciar
+            </a>
+        </div>
+    </div>
+    
+    <!-- Card: Vendas do Mês -->
+    <div class="dashboard-card">
+        <h3>💰 Vendas do Mês</h3>
+        <div class="dashboard-number" style="color: #DC2626;" id="vendas-mes">R$ {{ vendas_mes|default:"0,00" }}</div>
+        <div class="dashboard-label">faturamento mensal</div>
+        <div style="margin-top: 10px;">
+            <a href="{% url 'admin:pedidos_pedido_changelist' %}?data_pedido__month={{ current_month }}" class="button" style="font-size: 12px; padding: 5px 10px;">
+                Detalhes
+            </a>
+        </div>
+    </div>
+    
+    <!-- Card: Produtos Ativos -->
+    <div class="dashboard-card">
+        <h3>🛍️ Produtos Ativos</h3>
+        <div class="dashboard-number" style="color: #7c3aed;" id="produtos-ativos">{{ produtos_ativos|default:0 }}</div>
+        <div class="dashboard-label">produtos disponíveis</div>
+        <div style="margin-top: 10px;">
+            <a href="{% url 'admin:produtos_produto_changelist' %}?ativo=True" class="button" style="font-size: 12px; padding: 5px 10px;">
+                Ver catálogo
+            </a>
+        </div>
+    </div>
+    
+    <!-- Card: Usuários Online -->
+    <div class="dashboard-card">
+        <h3>🌐 Status do Sistema</h3>
+        <div class="dashboard-number" style="color: #10b981; font-size: 16px;">✅ Online</div>
+        <div class="dashboard-label">sistema funcionando</div>
+        <div style="margin-top: 10px;">
+            <small style="color: #6b7280;">Última verificação: <span id="system-check">{{ last_check|default:"agora" }}</span></small>
+        </div>
+    </div>
+    
+</div>
+
+<!-- Ações Rápidas -->
+<div class="quick-actions" style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 30px;">
+    <h2 style="color: #1F2937; margin-bottom: 15px; font-size: 18px;">⚡ Ações Rápidas</h2>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <a href="{% url 'admin:pedidos_pedido_add' %}" class="button" style="background: #059669 !important; border-color: #047857 !important;">
+            ➕ Novo Pedido
+        </a>
+        <a href="{% url 'admin:auth_user_add' %}" class="button" style="background: #7c3aed !important; border-color: #6d28d9 !important;">
+            👤 Novo Usuário
+        </a>
+        <a href="{% url 'admin:produtos_produto_add' %}" class="button" style="background: #f59e0b !important; border-color: #d97706 !important;">
+            🛍️ Novo Produto
+        </a>
+        <a href="{% url 'admin:pedidos_pedido_changelist' %}?status=pendente" class="button" style="background: #ef4444 !important; border-color: #dc2626 !important;">
+            🔥 Pendentes
+        </a>
+    </div>
+</div>
+
+<!-- Resumo de Vendas Recentes -->
+<div class="recent-orders" style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 30px;">
+    <h2 style="color: #1F2937; margin-bottom: 15px; font-size: 18px;">📋 Últimos Pedidos</h2>
+    
+    {% if recent_orders %}
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: #f8f9fa; border-bottom: 2px solid #e5e7eb;">
+                        <th style="padding: 10px; text-align: left; color: #374151; font-weight: 600;">Pedido</th>
+                        <th style="padding: 10px; text-align: left; color: #374151; font-weight: 600;">Cliente</th>
+                        <th style="padding: 10px; text-align: left; color: #374151; font-weight: 600;">Status</th>
+                        <th style="padding: 10px; text-align: left; color: #374151; font-weight: 600;">Total</th>
+                        <th style="padding: 10px; text-align: left; color: #374151; font-weight: 600;">Data</th>
+                        <th style="padding: 10px; text-align: left; color: #374151; font-weight: 600;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pedido in recent_orders %}
+                    <tr style="border-bottom: 1px solid #f1f5f9;">
+                        <td style="padding: 10px; font-family: monospace; color: #0066cc; font-weight: bold;">
+                            #{{ pedido.numero_pedido|slice:":8" }}
+                        </td>
+                        <td style="padding: 10px;">
+                            {% if pedido.cliente %}
+                                {{ pedido.cliente.nome_completo }}
+                            {% else %}
+                                {{ pedido.nome_cliente }}
+                            {% endif %}
+                        </td>
+                        <td style="padding: 10px;">
+                            <span class="status-badge status-{{ pedido.status }}">
+                                {{ pedido.get_status_display }}
+                            </span>
+                        </td>
+                        <td style="padding: 10px; color: #059669; font-weight: bold;">
+                            R$ {{ pedido.total }}
+                        </td>
+                        <td style="padding: 10px; color: #6b7280;">
+                            {{ pedido.data_pedido|date:"d/m/Y H:i" }}
+                        </td>
+                        <td style="padding: 10px;">
+                            <a href="{% url 'admin:pedidos_pedido_change' pedido.pk %}" 
+                               style="color: #DC2626; text-decoration: none; font-weight: 500;">
+                                Editar
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div style="text-align: center; margin-top: 15px;">
+            <a href="{% url 'admin:pedidos_pedido_changelist' %}" class="button">
+                Ver todos os pedidos
+            </a>
+        </div>
+    {% else %}
+        <p style="text-align: center; color: #6b7280; padding: 40px 0;">
+            📭 Nenhum pedido encontrado. 
+            <a href="{% url 'admin:pedidos_pedido_add' %}" style="color: #DC2626;">Criar primeiro pedido</a>
+        </p>
+    {% endif %}
+</div>
+
+<!-- Alertas e Notificações -->
+{% if alerts %}
+<div class="admin-alerts" style="margin-bottom: 30px;">
+    {% for alert in alerts %}
+    <div class="alert alert-{{ alert.type }}" style="background: #fee2e2; border-left: 4px solid #ef4444; padding: 12px 16px; margin-bottom: 10px; border-radius: 4px;">
+        <strong>{{ alert.title }}</strong>: {{ alert.message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<script>
+// Adicionar funcionalidades dinâmicas
+document.addEventListener('DOMContentLoaded', function() {
+    // Atualizar timestamp do sistema
+    setInterval(function() {
+        const systemCheck = document.getElementById('system-check');
+        if (systemCheck) {
+            systemCheck.textContent = new Date().toLocaleTimeString('pt-BR');
+        }
+    }, 30000); // Atualizar a cada 30 segundos
+    
+    // Adicionar efeito hover nos cards
+    const cards = document.querySelectorAll('.dashboard-card');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+        });
+    });
+});
+</script>
+
+</div>
+{% endblock %}

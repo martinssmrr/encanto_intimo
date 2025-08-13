@@ -1,0 +1,348 @@
+/* ==========================================================================
+   CUSTOMIZAÇÕES ADMIN ENCANTO ÍNTIMO
+   Cores: Vermelho (#DC2626) e Preto (#1F2937)
+   ========================================================================== */
+
+/* Header personalizado */
+#header {
+    background: linear-gradient(135deg, #DC2626 0%, #1F2937 100%) !important;
+    color: white !important;
+    border-bottom: 3px solid #DC2626;
+}
+
+#header h1 {
+    color: white !important;
+    font-weight: bold;
+}
+
+#header h1 a:link, #header h1 a:visited {
+    color: white !important;
+}
+
+#user-tools {
+    color: white !important;
+}
+
+#user-tools a:link, #user-tools a:visited {
+    color: white !important;
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+}
+
+/* Breadcrumbs */
+.breadcrumbs {
+    background: #f8f9fa !important;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.breadcrumbs a {
+    color: #DC2626 !important;
+}
+
+/* Botões */
+.button, input[type=submit], input[type=button], .submit-row input, a.button {
+    background: #DC2626 !important;
+    border: 1px solid #B91C1C !important;
+    color: white !important;
+    border-radius: 4px !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+}
+
+.button:hover, input[type=submit]:hover, input[type=button]:hover, .submit-row input:hover, a.button:hover {
+    background: #B91C1C !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3) !important;
+}
+
+.button.default, input[type=submit].default, .submit-row input.default {
+    background: #1F2937 !important;
+    border-color: #374151 !important;
+}
+
+.button.default:hover, input[type=submit].default:hover, .submit-row input.default:hover {
+    background: #374151 !important;
+}
+
+/* Links */
+a:link, a:visited {
+    color: #DC2626 !important;
+}
+
+a:hover {
+    color: #B91C1C !important;
+}
+
+/* Tabelas */
+#changelist-table {
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+}
+
+#changelist-table thead th {
+    background: #1F2937 !important;
+    color: white !important;
+    font-weight: 600 !important;
+    border-bottom: 2px solid #DC2626 !important;
+}
+
+#changelist-table tbody tr:nth-child(even) {
+    background: #f8f9fa !important;
+}
+
+#changelist-table tbody tr:hover {
+    background: #fee2e2 !important;
+}
+
+/* Filtros */
+#changelist-filter {
+    background: #f8f9fa !important;
+    border: 1px solid #dee2e6 !important;
+    border-radius: 8px !important;
+}
+
+#changelist-filter h2 {
+    background: #1F2937 !important;
+    color: white !important;
+    padding: 10px 15px !important;
+    margin: 0 !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+}
+
+#changelist-filter h3 {
+    color: #DC2626 !important;
+    font-weight: 600 !important;
+    padding: 8px 15px !important;
+    margin: 0 !important;
+    border-bottom: 1px solid #dee2e6 !important;
+}
+
+#changelist-filter li.selected a {
+    background: #DC2626 !important;
+    color: white !important;
+    border-radius: 4px !important;
+}
+
+/* Formulários */
+.form-row {
+    border-bottom: 1px solid #f1f5f9 !important;
+    padding: 15px 0 !important;
+}
+
+.form-row:last-child {
+    border-bottom: none !important;
+}
+
+fieldset h2 {
+    background: linear-gradient(135deg, #DC2626 0%, #1F2937 100%) !important;
+    color: white !important;
+    padding: 10px 15px !important;
+    margin: 0 0 15px 0 !important;
+    border-radius: 6px !important;
+    font-weight: 600 !important;
+}
+
+fieldset.collapse h2 {
+    background: #6b7280 !important;
+}
+
+/* Status badges personalizados */
+.status-badge {
+    padding: 4px 12px !important;
+    border-radius: 12px !important;
+    font-size: 11px !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+}
+
+.status-pendente { background: #fbbf24 !important; color: #92400e !important; }
+.status-confirmado { background: #60a5fa !important; color: #1e40af !important; }
+.status-processando { background: #34d399 !important; color: #047857 !important; }
+.status-enviado { background: #f97316 !important; color: white !important; }
+.status-entregue { background: #22c55e !important; color: white !important; }
+.status-cancelado { background: #ef4444 !important; color: white !important; }
+
+/* Cards do dashboard */
+.dashboard-card {
+    background: white !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    padding: 20px !important;
+    margin-bottom: 20px !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+    transition: all 0.2s ease !important;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+}
+
+.dashboard-card h3 {
+    color: #1F2937 !important;
+    margin-bottom: 10px !important;
+    font-weight: 600 !important;
+}
+
+.dashboard-number {
+    font-size: 32px !important;
+    font-weight: bold !important;
+    color: #DC2626 !important;
+    margin-bottom: 5px !important;
+}
+
+.dashboard-label {
+    color: #6b7280 !important;
+    font-size: 14px !important;
+}
+
+/* Inlines */
+.inline-group {
+    border: 1px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    margin-bottom: 20px !important;
+}
+
+.inline-group .aligned h2 {
+    background: #f8f9fa !important;
+    color: #1F2937 !important;
+    padding: 10px 15px !important;
+    margin: 0 !important;
+    border-bottom: 1px solid #e5e7eb !important;
+}
+
+/* Mensagens */
+.messagelist {
+    border-radius: 6px !important;
+    overflow: hidden !important;
+}
+
+.messagelist .info {
+    background: #dbeafe !important;
+    border-left: 4px solid #3b82f6 !important;
+}
+
+.messagelist .success {
+    background: #d1fae5 !important;
+    border-left: 4px solid #10b981 !important;
+}
+
+.messagelist .warning {
+    background: #fef3c7 !important;
+    border-left: 4px solid #f59e0b !important;
+}
+
+.messagelist .error {
+    background: #fee2e2 !important;
+    border-left: 4px solid #ef4444 !important;
+}
+
+/* Paginação */
+.paginator {
+    text-align: center !important;
+    margin: 20px 0 !important;
+}
+
+.paginator a, .paginator .this-page {
+    padding: 8px 12px !important;
+    margin: 0 2px !important;
+    border-radius: 4px !important;
+    border: 1px solid #e5e7eb !important;
+    display: inline-block !important;
+    transition: all 0.2s ease !important;
+}
+
+.paginator a:hover {
+    background: #DC2626 !important;
+    color: white !important;
+    border-color: #DC2626 !important;
+}
+
+.paginator .this-page {
+    background: #1F2937 !important;
+    color: white !important;
+    border-color: #1F2937 !important;
+}
+
+/* Sidebar */
+#content-main {
+    border-radius: 8px !important;
+}
+
+.module h2, .module caption, .inline-group h2 {
+    font-weight: 600 !important;
+}
+
+/* Actions */
+.actions {
+    background: #f8f9fa !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 6px !important;
+    padding: 10px !important;
+    margin-bottom: 20px !important;
+}
+
+.actions select {
+    border: 1px solid #d1d5db !important;
+    border-radius: 4px !important;
+    padding: 6px 12px !important;
+}
+
+/* Search box */
+#changelist-search input[type="text"] {
+    border: 2px solid #e5e7eb !important;
+    border-radius: 6px !important;
+    padding: 8px 12px !important;
+    font-size: 14px !important;
+    transition: border-color 0.2s ease !important;
+}
+
+#changelist-search input[type="text"]:focus {
+    border-color: #DC2626 !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
+}
+
+/* Logo personalizado */
+#header h1:before {
+    content: "👗 ";
+    font-size: 24px !important;
+    margin-right: 8px !important;
+}
+
+/* Responsive melhorias */
+@media (max-width: 768px) {
+    #changelist-filter {
+        margin-top: 20px !important;
+    }
+    
+    .dashboard-card {
+        text-align: center !important;
+    }
+    
+    .dashboard-number {
+        font-size: 24px !important;
+    }
+}
+
+/* Dark mode toggle (futuro) */
+.theme-toggle {
+    position: fixed !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    background: #1F2937 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 50% !important;
+    width: 50px !important;
+    height: 50px !important;
+    cursor: pointer !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+    transition: all 0.2s ease !important;
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1) !important;
+    background: #DC2626 !important;
+}

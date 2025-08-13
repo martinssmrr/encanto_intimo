@@ -1,0 +1,124 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | Encanto Íntimo Admin{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        <img src="{% static 'admin_custom/images/logo-encanto-intimo.svg' %}" 
+             alt="Encanto Íntimo" 
+             style="height: 40px; margin-right: 12px; vertical-align: middle;"
+             onerror="this.style.display='none'">
+        <span style="display: none;">Encanto Íntimo - Painel Administrativo</span>
+    </a>
+</h1>
+{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'admin_custom/css/admin-theme.css' %}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<style>
+    /* Critical CSS para evitar FOUC */
+    body {
+        font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif !important;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+    
+    #header {
+        background: linear-gradient(135deg, #B71C1C 0%, #8B0000 50%, #000000 100%) !important;
+        border-bottom: 3px solid #FFD700 !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    }
+    
+    #site-name a:hover {
+        color: #fecaca !important;
+    }
+    
+    /* Loading animation */
+    .loading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #B71C1C, #FFD700, #B71C1C);
+        background-size: 200% 100%;
+        animation: loading 2s linear infinite;
+        z-index: 9999;
+    }
+    
+    @keyframes loading {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+</style>
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#B71C1C">
+<link rel="icon" type="image/svg+xml" href="{% static 'admin_custom/images/logo-encanto-intimo.svg' %}">
+
+<!-- Preload critical resources -->
+<link rel="preload" href="{% static 'admin_custom/css/admin-theme.css' %}" as="style">
+<link rel="preload" href="{% static 'admin_custom/js/admin-theme.js' %}" as="script">
+{% endblock %}
+
+{% block footer %}
+<div id="footer" style="background: #f8f9fa; border-top: 1px solid #dee2e6; padding: 15px; text-align: center; color: #6b7280; font-size: 13px;">
+    <p>
+        🛍️ <strong>Encanto Íntimo</strong> - Painel Administrativo | 
+        <span style="color: #DC2626;">♥</span> Desenvolvido com Django | 
+        © {{ request.META.HTTP_HOST|default:"Encanto Íntimo" }} {% now "Y" %}
+    </p>
+    <p style="margin-top: 5px;">
+        <small>
+            👤 Logado como: <strong>{{ user.get_full_name|default:user.username }}</strong> | 
+            🕒 Última atualização: <span id="last-update">{% now "d/m/Y H:i:s" %}</span>
+        </small>
+    </p>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+{{ block.super }}
+<script src="{% static 'admin_custom/js/admin-theme.js' %}" defer></script>
+
+<script>
+// Loading indicator
+document.addEventListener('DOMContentLoaded', function() {
+    // Remove loading indicator
+    const loading = document.querySelector('.loading');
+    if (loading) {
+        setTimeout(() => loading.remove(), 1000);
+    }
+    
+    // Add current year to context
+    document.body.setAttribute('data-year', new Date().getFullYear());
+});
+
+// Page transition effects
+window.addEventListener('beforeunload', function() {
+    document.body.style.opacity = '0.8';
+    document.body.style.transition = 'opacity 0.2s ease';
+});
+
+// Atualizar timestamp a cada minuto
+setInterval(function() {
+    const now = new Date();
+    const formatted = now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR');
+    const element = document.getElementById('last-update');
+    if (element) {
+        element.textContent = formatted;
+    }
+}, 60000);
+</script>
+
+<!-- Loading indicator -->
+<div class="loading"></div>
+{% endblock %}

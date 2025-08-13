@@ -1,0 +1,94 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Dashboard - Encanto Íntimo{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <div style="padding: 20px; background: white; border-radius: 8px; margin: 20px 0;">
+        <h1 style="color: #B71C1C; font-family: 'Poppins', sans-serif;">
+            🎀 Bem-vindo ao Painel Administrativo da Encanto Íntimo
+        </h1>
+        <p style="color: #666; margin: 10px 0;">Gerencie sua loja com elegância e eficiência</p>
+        
+        <!-- Estatísticas -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 30px 0;">
+            <div style="background: linear-gradient(135deg, #B71C1C, #8B0000); color: white; padding: 20px; border-radius: 8px; text-align: center;">
+                <h3 style="margin: 0; font-size: 32px;">{{ total_pedidos|default:"0" }}</h3>
+                <p style="margin: 5px 0 0 0;">Total de Pedidos</p>
+            </div>
+            
+            <div style="background: linear-gradient(135deg, #FF9800, #F57C00); color: white; padding: 20px; border-radius: 8px; text-align: center;">
+                <h3 style="margin: 0; font-size: 32px;">{{ pedidos_pendentes|default:"0" }}</h3>
+                <p style="margin: 5px 0 0 0;">Pedidos Pendentes</p>
+            </div>
+            
+            <div style="background: linear-gradient(135deg, #4CAF50, #45a049); color: white; padding: 20px; border-radius: 8px; text-align: center;">
+                <h3 style="margin: 0; font-size: 32px;">{{ total_clientes|default:"0" }}</h3>
+                <p style="margin: 5px 0 0 0;">Clientes Cadastrados</p>
+            </div>
+            
+            <div style="background: linear-gradient(135deg, #FFD700, #FFC107); color: #333; padding: 20px; border-radius: 8px; text-align: center;">
+                <h3 style="margin: 0; font-size: 32px;">R$ {{ vendas_mes|default:"0" }}</h3>
+                <p style="margin: 5px 0 0 0;">Vendas do Mês</p>
+            </div>
+        </div>
+        
+        <!-- Ações Rápidas -->
+        <div style="margin: 30px 0;">
+            <h2 style="color: #333; font-family: 'Poppins', sans-serif;">⚡ Ações Rápidas</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0;">
+                
+                <div style="background: #f8f9fa; border-radius: 8px; padding: 20px;">
+                    <h3 style="color: #B71C1C; margin: 0 0 15px 0;">📦 Pedidos</h3>
+                    <a href="{% url 'admin:pedidos_pedido_add' %}" style="display: block; background: #B71C1C; color: white; padding: 10px; border-radius: 5px; text-decoration: none; margin: 5px 0; text-align: center;">
+                        ➕ Novo Pedido
+                    </a>
+                    <a href="{% url 'admin:pedidos_pedido_changelist' %}" style="display: block; background: #6c757d; color: white; padding: 10px; border-radius: 5px; text-decoration: none; margin: 5px 0; text-align: center;">
+                        📋 Todos os Pedidos
+                    </a>
+                </div>
+                
+                <div style="background: #f8f9fa; border-radius: 8px; padding: 20px;">
+                    <h3 style="color: #B71C1C; margin: 0 0 15px 0;">🛍️ Produtos</h3>
+                    <a href="{% url 'admin:produtos_produto_add' %}" style="display: block; background: #B71C1C; color: white; padding: 10px; border-radius: 5px; text-decoration: none; margin: 5px 0; text-align: center;">
+                        ➕ Novo Produto
+                    </a>
+                    <a href="{% url 'admin:produtos_produto_changelist' %}" style="display: block; background: #6c757d; color: white; padding: 10px; border-radius: 5px; text-decoration: none; margin: 5px 0; text-align: center;">
+                        📦 Gerenciar Estoque
+                    </a>
+                </div>
+                
+                <div style="background: #f8f9fa; border-radius: 8px; padding: 20px;">
+                    <h3 style="color: #B71C1C; margin: 0 0 15px 0;">👥 Clientes</h3>
+                    <a href="{% url 'admin:auth_user_add' %}" style="display: block; background: #B71C1C; color: white; padding: 10px; border-radius: 5px; text-decoration: none; margin: 5px 0; text-align: center;">
+                        ➕ Novo Cliente
+                    </a>
+                    <a href="{% url 'admin:auth_user_changelist' %}" style="display: block; background: #6c757d; color: white; padding: 10px; border-radius: 5px; text-decoration: none; margin: 5px 0; text-align: center;">
+                        👥 Todos os Clientes
+                    </a>
+                </div>
+                
+                <div style="background: #f8f9fa; border-radius: 8px; padding: 20px;">
+                    <h3 style="color: #B71C1C; margin: 0 0 15px 0;">📊 Relatórios</h3>
+                    <a href="{% url 'admin:pagamentos_pagamento_changelist' %}" style="display: block; background: #4CAF50; color: white; padding: 10px; border-radius: 5px; text-decoration: none; margin: 5px 0; text-align: center;">
+                        💳 Pagamentos
+                    </a>
+                    <a href="{% url 'admin:fornecedores_fornecedor_changelist' %}" style="display: block; background: #6c757d; color: white; padding: 10px; border-radius: 5px; text-decoration: none; margin: 5px 0; text-align: center;">
+                        🏢 Fornecedores
+                    </a>
+                </div>
+                
+            </div>
+        </div>
+        
+        <!-- Alertas -->
+        <div style="margin: 30px 0;">
+            <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 5px; border-left: 4px solid #4CAF50;">
+                <strong>✅ Sistema Online:</strong> Todos os serviços estão funcionando normalmente.
+            </div>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}
