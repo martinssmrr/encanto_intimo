@@ -1,0 +1,269 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pagamento Pendente - Encanto Íntimo{% endblock %}
+
+{% block extra_css %}
+<style>
+    .pending-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        overflow: hidden;
+        margin-top: 2rem;
+    }
+    
+    .pending-header {
+        background: linear-gradient(135deg, #ffc107, #e0a800);
+        color: white;
+        padding: 40px;
+        text-align: center;
+    }
+    
+    .pending-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+    
+    .info-section {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 25px;
+        border-left: 4px solid #ffc107;
+    }
+    
+    .pending-details {
+        background: #fff3cd;
+        border-radius: 12px;
+        padding: 25px;
+        border: 2px solid #ffc107;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="pending-container">
+        <!-- Header de Pendência -->
+        <div class="pending-header">
+            <div class="pending-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <h1 class="mb-3">Pagamento Pendente</h1>
+            <p class="lead mb-0">
+                Seu pagamento está sendo processado. Aguarde a confirmação.
+            </p>
+        </div>
+        
+        <div class="p-4">
+            <div class="row">
+                <!-- Informações -->
+                <div class="col-lg-8">
+                    <div class="info-section">
+                        <h4 class="mb-3">
+                            <i class="fas fa-info-circle me-2 text-info"></i>
+                            Status do Pagamento
+                        </h4>
+                        
+                        <p class="mb-3">
+                            Seu pagamento está sendo processado pelo Mercado Pago. 
+                            O tempo de confirmação varia conforme a forma de pagamento escolhida:
+                        </p>
+                        
+                        <ul class="mb-3">
+                            <li><strong>PIX:</strong> Confirmação instantânea</li>
+                            <li><strong>Cartão de Crédito:</strong> Até 2 horas</li>
+                            <li><strong>Boleto Bancário:</strong> 1 a 3 dias úteis</li>
+                            <li><strong>Transferência:</strong> 1 a 2 dias úteis</li>
+                        </ul>
+                        
+                        <div class="alert alert-warning">
+                            <h6><i class="fas fa-exclamation-triangle me-2"></i>Importante</h6>
+                            <p class="mb-0">
+                                Seus produtos estão reservados até a confirmação do pagamento. 
+                                Você receberá uma notificação por e-mail assim que o pagamento for aprovado.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    {% if pedido %}
+                    <div class="info-section">
+                        <h4 class="mb-3">
+                            <i class="fas fa-receipt me-2 text-primary"></i>
+                            Detalhes do Pedido
+                        </h4>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Número do Pedido:</strong></p>
+                                <p class="fs-5 text-primary">#{{ pedido.numero_pedido|slice:":8" }}</p>
+                                
+                                <p><strong>Status:</strong></p>
+                                <p>
+                                    <span class="badge bg-warning fs-6">
+                                        {{ pedido.get_status_display }}
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Data do Pedido:</strong></p>
+                                <p>{{ pedido.data_pedido|date:"d/m/Y 'às' H:i" }}</p>
+                                
+                                <p><strong>Total:</strong></p>
+                                <p class="fs-4 text-warning fw-bold">R$ {{ pedido.total|floatformat:2 }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h4 class="mb-3">
+                            <i class="fas fa-list-check me-2 text-info"></i>
+                            Próximos Passos
+                        </h4>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Se o pagamento for aprovado:</h6>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">
+                                        <i class="fas fa-check text-success me-2"></i>
+                                        Você receberá um e-mail de confirmação
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="fas fa-box text-info me-2"></i>
+                                        Seu pedido entrará em preparação
+                                    </li>
+                                    <li class="mb-0">
+                                        <i class="fas fa-truck text-primary me-2"></i>
+                                        Receberá o código de rastreamento
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Se o pagamento for rejeitado:</h6>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">
+                                        <i class="fas fa-envelope text-warning me-2"></i>
+                                        Você será notificado por e-mail
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="fas fa-redo text-info me-2"></i>
+                                        Poderá tentar o pagamento novamente
+                                    </li>
+                                    <li class="mb-0">
+                                        <i class="fas fa-shopping-cart text-primary me-2"></i>
+                                        Produtos voltam ao carrinho
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Sidebar -->
+                <div class="col-lg-4">
+                    <div class="pending-details">
+                        <h5 class="mb-3">
+                            <i class="fas fa-clock me-2"></i>
+                            Acompanhe seu Pagamento
+                        </h5>
+                        
+                        <p class="mb-3">
+                            Você pode acompanhar o status do seu pagamento:
+                        </p>
+                        
+                        <div class="d-grid gap-2 mb-4">
+                            {% if pedido %}
+                            <a href="{% url 'pedidos:detalhe' pedido.numero_pedido %}" 
+                               class="btn btn-primary">
+                                <i class="fas fa-eye me-2"></i>
+                                Ver Detalhes do Pedido
+                            </a>
+                            {% endif %}
+                            
+                            <button type="button" class="btn btn-outline-primary" 
+                                    onclick="location.reload()">
+                                <i class="fas fa-sync me-2"></i>
+                                Atualizar Status
+                            </button>
+                        </div>
+                        
+                        {% if pedido %}
+                        <div class="mt-3">
+                            <h6>Itens do Pedido:</h6>
+                            {% for item in pedido.itens.all %}
+                                <div class="d-flex justify-content-between mb-2">
+                                    <small>{{ item.nome_produto }}</small>
+                                    <small>{{ item.quantidade }}x</small>
+                                </div>
+                            {% endfor %}
+                            
+                            <hr>
+                            
+                            <div class="d-flex justify-content-between fw-bold">
+                                <span>Total:</span>
+                                <span class="text-warning">R$ {{ pedido.total|floatformat:2 }}</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="info-section mt-4">
+                        <h6><i class="fas fa-headset me-2"></i>Dúvidas?</h6>
+                        
+                        <p class="mb-2">
+                            Entre em contato conosco:
+                        </p>
+                        
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2">
+                                <i class="fab fa-whatsapp text-success me-2"></i>
+                                <strong>WhatsApp:</strong> (11) 99999-9999
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-envelope text-primary me-2"></i>
+                                <strong>E-mail:</strong> contato@encantointimo.com.br
+                            </li>
+                            <li class="mb-0">
+                                <i class="fas fa-clock text-info me-2"></i>
+                                <strong>Horário:</strong> Segunda a Sexta, 9h às 18h
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Ações -->
+            <div class="text-center mt-4">
+                <a href="{% url 'produtos:lista' %}" class="btn btn-outline-secondary me-3">
+                    <i class="fas fa-shopping-bag me-2"></i>
+                    Continuar Comprando
+                </a>
+                
+                {% if user.is_authenticated %}
+                <a href="{% url 'pedidos:meus_pedidos' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-list me-2"></i>
+                    Meus Pedidos
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Auto-refresh a cada 30 segundos -->
+<script>
+setTimeout(function() {
+    location.reload();
+}, 30000); // 30 segundos
+</script>
+{% endblock %}

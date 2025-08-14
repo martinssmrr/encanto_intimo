@@ -1,0 +1,321 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Meus Pedidos - Encanto Íntimo{% endblock %}
+
+{% block extra_css %}
+<style>
+    .pedidos-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    .header-section {
+        background: linear-gradient(135deg, #B71C1C, #8B0000);
+        color: white;
+        padding: 30px;
+        text-align: center;
+    }
+    
+    .pedido-card {
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .pedido-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    
+    .pedido-header {
+        background: #f8f9fa;
+        padding: 20px;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .pedido-body {
+        padding: 20px;
+    }
+    
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .status-pendente {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+    }
+    
+    .status-confirmado {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+    }
+    
+    .status-processando {
+        background: #ffecd1;
+        color: #8a4b00;
+        border: 1px solid #fdebab;
+    }
+    
+    .status-enviado {
+        background: #e2d9f3;
+        color: #5a2d82;
+        border: 1px solid #d1b3ff;
+    }
+    
+    .status-entregue {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    
+    .status-cancelado {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+    
+    .produto-item {
+        display: flex;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #f8f9fa;
+    }
+    
+    .produto-item:last-child {
+        border-bottom: none;
+    }
+    
+    .produto-imagem {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-right: 15px;
+    }
+    
+    .btn-acao {
+        margin-right: 10px;
+        margin-bottom: 5px;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6c757d;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        color: #B71C1C;
+    }
+    
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 30px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="pedidos-container">
+        <div class="header-section">
+            <h2><i class="fas fa-shopping-bag me-2"></i>Meus Pedidos</h2>
+            <p class="mb-0">Acompanhe seus pedidos e histórico de compras</p>
+        </div>
+        
+        <div class="p-4">
+            {% if pedidos %}
+                <!-- Lista de Pedidos -->
+                {% for pedido in pedidos %}
+                    <div class="pedido-card">
+                        <div class="pedido-header">
+                            <div class="row align-items-center">
+                                <div class="col-md-3">
+                                    <h6 class="mb-1">Pedido #{{ pedido.numero_pedido|slice:":8" }}</h6>
+                                    <small class="text-muted">{{ pedido.data_pedido|date:"d/m/Y H:i" }}</small>
+                                </div>
+                                
+                                <div class="col-md-3">
+                                    <span class="status-badge status-{{ pedido.status }}">
+                                        {{ pedido.get_status_display }}
+                                    </span>
+                                </div>
+                                
+                                <div class="col-md-3">
+                                    <strong class="text-primary">R$ {{ pedido.total|floatformat:2 }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ pedido.get_forma_pagamento_display }}</small>
+                                </div>
+                                
+                                <div class="col-md-3 text-end">
+                                    <!-- Ações -->
+                                    <a href="{% url 'pedidos:detalhe' pedido.numero_pedido %}" 
+                                       class="btn btn-outline-primary btn-sm btn-acao">
+                                        <i class="fas fa-eye me-1"></i>Ver Detalhes
+                                    </a>
+                                    
+                                    {% if pedido.pode_cancelar %}
+                                        <a href="{% url 'pedidos:cancelar' pedido.numero_pedido %}" 
+                                           class="btn btn-outline-danger btn-sm btn-acao">
+                                            <i class="fas fa-times me-1"></i>Cancelar
+                                        </a>
+                                    {% endif %}
+                                    
+                                    {% if pedido.codigo_rastreamento %}
+                                        <a href="{% url 'pedidos:rastrear' pedido.numero_pedido %}" 
+                                           class="btn btn-outline-success btn-sm btn-acao">
+                                            <i class="fas fa-truck me-1"></i>Rastrear
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="pedido-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h6 class="mb-3">
+                                        <i class="fas fa-box me-2"></i>
+                                        Itens ({{ pedido.total_itens }})
+                                    </h6>
+                                    
+                                    {% for item in pedido.itens.all|slice:":3" %}
+                                        <div class="produto-item">
+                                            {% if item.produto.imagem_principal %}
+                                                <img src="{{ item.produto.imagem_principal.url }}" 
+                                                     alt="{{ item.nome_produto }}" class="produto-imagem">
+                                            {% else %}
+                                                <div class="produto-imagem d-flex align-items-center justify-content-center bg-light">
+                                                    <i class="fas fa-image text-muted"></i>
+                                                </div>
+                                            {% endif %}
+                                            
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1">{{ item.nome_produto }}</h6>
+                                                <small class="text-muted">
+                                                    Qtd: {{ item.quantidade }} × R$ {{ item.preco_unitario|floatformat:2 }}
+                                                    {% if item.tamanho %} | Tamanho: {{ item.tamanho }}{% endif %}
+                                                    {% if item.cor %} | Cor: {{ item.cor }}{% endif %}
+                                                </small>
+                                                <div class="fw-bold">R$ {{ item.total_item|floatformat:2 }}</div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                    
+                                    {% if pedido.itens.count > 3 %}
+                                        <div class="text-center mt-2">
+                                            <small class="text-muted">
+                                                + {{ pedido.itens.count|add:"-3" }} item(s) a mais
+                                            </small>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <h6 class="mb-3">
+                                        <i class="fas fa-map-marker-alt me-2"></i>
+                                        Entrega
+                                    </h6>
+                                    
+                                    <address class="mb-0">
+                                        <strong>{{ pedido.nome_cliente }}</strong><br>
+                                        {{ pedido.endereco }}, {{ pedido.numero }}<br>
+                                        {% if pedido.complemento %}{{ pedido.complemento }}<br>{% endif %}
+                                        {{ pedido.bairro }}<br>
+                                        {{ pedido.cidade }}/{{ pedido.estado }} - {{ pedido.cep }}
+                                    </address>
+                                    
+                                    {% if pedido.status == 'enviado' and pedido.data_envio %}
+                                        <div class="mt-3">
+                                            <small class="text-success">
+                                                <i class="fas fa-truck me-1"></i>
+                                                Enviado em {{ pedido.data_envio|date:"d/m/Y" }}
+                                            </small>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    {% if pedido.status == 'entregue' and pedido.data_entrega %}
+                                        <div class="mt-3">
+                                            <small class="text-success">
+                                                <i class="fas fa-check-circle me-1"></i>
+                                                Entregue em {{ pedido.data_entrega|date:"d/m/Y" }}
+                                            </small>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                
+                <!-- Paginação -->
+                {% if is_paginated %}
+                    <div class="pagination-container">
+                        <nav aria-label="Navegação de pedidos">
+                            <ul class="pagination">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1">
+                                            <i class="fas fa-angle-double-left"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                                            <i class="fas fa-angle-left"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                
+                                <li class="page-item active">
+                                    <span class="page-link">
+                                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                    </span>
+                                </li>
+                                
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                            <i class="fas fa-angle-right"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">
+                                            <i class="fas fa-angle-double-right"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                {% endif %}
+                
+            {% else %}
+                <!-- Estado Vazio -->
+                <div class="empty-state">
+                    <i class="fas fa-shopping-bag"></i>
+                    <h4>Nenhum pedido encontrado</h4>
+                    <p>Você ainda não fez nenhum pedido em nossa loja.</p>
+                    <a href="{% url 'produtos:lista' %}" class="btn btn-primary">
+                        <i class="fas fa-shopping-cart me-2"></i>Fazer Primeira Compra
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

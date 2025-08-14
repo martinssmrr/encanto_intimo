@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pagamento Rejeitado - Encanto Íntimo{% endblock %}
+
+{% block extra_css %}
+<style>
+    .failure-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        overflow: hidden;
+        margin-top: 2rem;
+    }
+    
+    .failure-header {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        color: white;
+        padding: 40px;
+        text-align: center;
+    }
+    
+    .failure-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+    
+    .info-section {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 25px;
+        border-left: 4px solid #dc3545;
+    }
+    
+    .retry-section {
+        background: #fff3cd;
+        border-radius: 12px;
+        padding: 25px;
+        border: 2px solid #ffc107;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="failure-container">
+        <!-- Header de Falha -->
+        <div class="failure-header">
+            <div class="failure-icon">
+                <i class="fas fa-times-circle"></i>
+            </div>
+            <h1 class="mb-3">Pagamento Não Aprovado</h1>
+            <p class="lead mb-0">
+                Houve um problema com o processamento do seu pagamento. 
+                Não se preocupe, você pode tentar novamente.
+            </p>
+        </div>
+        
+        <div class="p-4">
+            <div class="row">
+                <!-- Informações -->
+                <div class="col-lg-8">
+                    <div class="info-section">
+                        <h4 class="mb-3">
+                            <i class="fas fa-exclamation-triangle me-2 text-warning"></i>
+                            O que aconteceu?
+                        </h4>
+                        
+                        <p class="mb-3">
+                            Seu pagamento foi rejeitado ou cancelado. Os motivos mais comuns são:
+                        </p>
+                        
+                        <ul class="mb-3">
+                            <li>Dados do cartão incorretos ou expirado</li>
+                            <li>Limite insuficiente</li>
+                            <li>Cartão bloqueado pelo banco</li>
+                            <li>Cancelamento voluntário durante o processo</li>
+                        </ul>
+                        
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-info-circle me-2"></i>Importante</h6>
+                            <p class="mb-0">
+                                Nenhum valor foi cobrado em seu cartão. 
+                                Seus produtos continuam reservados por mais 30 minutos.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    {% if pedido %}
+                    <div class="info-section">
+                        <h4 class="mb-3">
+                            <i class="fas fa-receipt me-2 text-primary"></i>
+                            Detalhes do Pedido
+                        </h4>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Número do Pedido:</strong></p>
+                                <p class="fs-5 text-primary">#{{ pedido.numero_pedido|slice:":8" }}</p>
+                                
+                                <p><strong>Status:</strong></p>
+                                <p>
+                                    <span class="badge bg-warning fs-6">
+                                        Pagamento Pendente
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Data:</strong></p>
+                                <p>{{ pedido.data_pedido|date:"d/m/Y 'às' H:i" }}</p>
+                                
+                                <p><strong>Total:</strong></p>
+                                <p class="fs-4 text-primary fw-bold">R$ {{ pedido.total|floatformat:2 }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Sidebar -->
+                <div class="col-lg-4">
+                    <div class="retry-section">
+                        <h5 class="mb-3">
+                            <i class="fas fa-redo me-2"></i>
+                            Tentar Novamente
+                        </h5>
+                        
+                        <p class="mb-3">
+                            Você pode tentar o pagamento novamente com:
+                        </p>
+                        
+                        <ul class="list-unstyled mb-4">
+                            <li class="mb-2">
+                                <i class="fas fa-credit-card text-primary me-2"></i>
+                                Outro cartão de crédito
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-qrcode text-success me-2"></i>
+                                PIX (instantâneo)
+                            </li>
+                            <li class="mb-0">
+                                <i class="fas fa-barcode text-warning me-2"></i>
+                                Boleto bancário
+                            </li>
+                        </ul>
+                        
+                        <div class="d-grid gap-2">
+                            {% if pedido %}
+                            <a href="{% url 'pedidos:pagamento' pedido.numero_pedido %}" 
+                               class="btn btn-primary">
+                                <i class="fas fa-redo me-2"></i>
+                                Tentar Pagamento Novamente
+                            </a>
+                            {% else %}
+                            <a href="{% url 'carrinho:ver_carrinho' %}" 
+                               class="btn btn-primary">
+                                <i class="fas fa-shopping-cart me-2"></i>
+                                Voltar ao Carrinho
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="info-section mt-4">
+                        <h6><i class="fas fa-headset me-2"></i>Precisa de Ajuda?</h6>
+                        
+                        <p class="mb-2">
+                            Nossa equipe está pronta para ajudar:
+                        </p>
+                        
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2">
+                                <i class="fab fa-whatsapp text-success me-2"></i>
+                                <strong>WhatsApp:</strong> (11) 99999-9999
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-envelope text-primary me-2"></i>
+                                <strong>E-mail:</strong> contato@encantointimo.com.br
+                            </li>
+                            <li class="mb-0">
+                                <i class="fas fa-clock text-info me-2"></i>
+                                <strong>Horário:</strong> Segunda a Sexta, 9h às 18h
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Ações -->
+            <div class="text-center mt-4">
+                <a href="{% url 'produtos:lista' %}" class="btn btn-outline-secondary me-3">
+                    <i class="fas fa-arrow-left me-2"></i>
+                    Continuar Comprando
+                </a>
+                
+                {% if user.is_authenticated %}
+                <a href="{% url 'pedidos:meus_pedidos' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-list me-2"></i>
+                    Meus Pedidos
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

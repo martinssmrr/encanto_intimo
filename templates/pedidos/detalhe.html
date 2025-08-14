@@ -1,0 +1,400 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pedido #{{ pedido.numero_pedido|slice:":8" }} - Encanto Íntimo{% endblock %}
+
+{% block extra_css %}
+<style>
+    .pedido-detail-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    .header-section {
+        background: linear-gradient(135deg, #B71C1C, #8B0000);
+        color: white;
+        padding: 30px;
+    }
+    
+    .status-badge {
+        padding: 8px 16px;
+        border-radius: 25px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        display: inline-block;
+    }
+    
+    .status-pendente { background: #fff3cd; color: #856404; }
+    .status-confirmado { background: #d1ecf1; color: #0c5460; }
+    .status-processando { background: #ffecd1; color: #8a4b00; }
+    .status-enviado { background: #e2d9f3; color: #5a2d82; }
+    .status-entregue { background: #d4edda; color: #155724; }
+    .status-cancelado { background: #f8d7da; color: #721c24; }
+    
+    .info-card {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 25px;
+        border-left: 4px solid #B71C1C;
+    }
+    
+    .produto-item {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        border-bottom: 1px solid #e9ecef;
+        transition: background 0.3s ease;
+    }
+    
+    .produto-item:hover {
+        background: #f8f9fa;
+    }
+    
+    .produto-item:last-child {
+        border-bottom: none;
+    }
+    
+    .produto-imagem {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-right: 20px;
+    }
+    
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 15px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #e9ecef;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 25px;
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -37px;
+        top: 25px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #B71C1C;
+        border: 3px solid white;
+        box-shadow: 0 0 0 3px #e9ecef;
+    }
+    
+    .timeline-item.current::before {
+        background: #FFD700;
+        box-shadow: 0 0 0 3px #FFD700;
+    }
+    
+    .btn-action {
+        margin-right: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .total-section {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 25px;
+        border: 2px solid #FFD700;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="pedido-detail-container">
+        <!-- Header -->
+        <div class="header-section">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h2><i class="fas fa-receipt me-2"></i>Pedido #{{ pedido.numero_pedido|slice:":8" }}</h2>
+                    <p class="mb-0">Realizado em {{ pedido.data_pedido|date:"d/m/Y 'às' H:i" }}</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <span class="status-badge status-{{ pedido.status }}">
+                        {{ pedido.get_status_display }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="p-4">
+            <!-- Ações -->
+            <div class="mb-4">
+                <a href="{% url 'pedidos:meus_pedidos' %}" class="btn btn-outline-secondary btn-action">
+                    <i class="fas fa-arrow-left me-2"></i>Voltar aos Pedidos
+                </a>
+                
+                {% if pedido.pode_cancelar %}
+                    <a href="{% url 'pedidos:cancelar' pedido.numero_pedido %}" 
+                       class="btn btn-outline-danger btn-action">
+                        <i class="fas fa-times me-2"></i>Cancelar Pedido
+                    </a>
+                {% endif %}
+                
+                {% if pedido.codigo_rastreamento %}
+                    <a href="{% url 'pedidos:rastrear' pedido.numero_pedido %}" 
+                       class="btn btn-outline-primary btn-action">
+                        <i class="fas fa-truck me-2"></i>Rastrear Entrega
+                    </a>
+                {% endif %}
+                
+                <!-- Simular confirmação de pagamento para testes -->
+                {% if pedido.status == 'pendente' %}
+                    <a href="{% url 'pedidos:confirmar_pagamento_manual' pedido.numero_pedido %}" 
+                       class="btn btn-success btn-action"
+                       onclick="return confirm('Simular confirmação de pagamento para teste?')">
+                        <i class="fas fa-check me-2"></i>Simular Pagamento (Teste)
+                    </a>
+                {% endif %}
+            </div>
+            
+            <div class="row">
+                <!-- Informações do Pedido -->
+                <div class="col-lg-8">
+                    <!-- Dados do Cliente -->
+                    <div class="info-card">
+                        <h5 class="mb-3">
+                            <i class="fas fa-user me-2 text-primary"></i>
+                            Dados do Cliente
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Nome:</strong> {{ pedido.nome_cliente }}<br>
+                                <strong>E-mail:</strong> {{ pedido.email_cliente }}<br>
+                                <strong>Telefone:</strong> {{ pedido.telefone_cliente }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Usuário:</strong> {{ pedido.usuario.username }}<br>
+                                <strong>Data do Cadastro:</strong> {{ pedido.usuario.date_joined|date:"d/m/Y" }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Endereço de Entrega -->
+                    <div class="info-card">
+                        <h5 class="mb-3">
+                            <i class="fas fa-map-marker-alt me-2 text-primary"></i>
+                            Endereço de Entrega
+                        </h5>
+                        <address class="mb-0">
+                            <strong>{{ pedido.nome_cliente }}</strong><br>
+                            {{ pedido.endereco }}, {{ pedido.numero }}<br>
+                            {% if pedido.complemento %}{{ pedido.complemento }}<br>{% endif %}
+                            {{ pedido.bairro }}<br>
+                            {{ pedido.cidade }}/{{ pedido.estado }} - {{ pedido.cep }}
+                        </address>
+                    </div>
+                    
+                    <!-- Itens do Pedido -->
+                    <div class="info-card">
+                        <h5 class="mb-3">
+                            <i class="fas fa-box me-2 text-primary"></i>
+                            Itens do Pedido ({{ pedido.total_itens }})
+                        </h5>
+                        
+                        <div class="produtos-list">
+                            {% for item in pedido.itens.all %}
+                                <div class="produto-item">
+                                    {% if item.produto.imagem_principal %}
+                                        <img src="{{ item.produto.imagem_principal.url }}" 
+                                             alt="{{ item.nome_produto }}" class="produto-imagem">
+                                    {% else %}
+                                        <div class="produto-imagem d-flex align-items-center justify-content-center bg-light">
+                                            <i class="fas fa-image text-muted fa-2x"></i>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">{{ item.nome_produto }}</h6>
+                                        
+                                        <div class="text-muted mb-2">
+                                            {% if item.tamanho %}
+                                                <small><strong>Tamanho:</strong> {{ item.tamanho }}</small>
+                                            {% endif %}
+                                            {% if item.cor %}
+                                                <small class="ms-3"><strong>Cor:</strong> {{ item.cor }}</small>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        {% if item.fornecedor_nome %}
+                                            <small class="text-muted">
+                                                <i class="fas fa-industry me-1"></i>
+                                                Fornecedor: {{ item.fornecedor_nome }}
+                                            </small>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="text-end">
+                                        <div class="mb-1">
+                                            <small class="text-muted">Qtd: {{ item.quantidade }}</small>
+                                        </div>
+                                        <div class="mb-1">
+                                            <small class="text-muted">Unit: R$ {{ item.preco_unitario|floatformat:2 }}</small>
+                                        </div>
+                                        <div class="fw-bold text-primary">
+                                            R$ {{ item.total_item|floatformat:2 }}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Informações de Pagamento -->
+                    <div class="info-card">
+                        <h5 class="mb-3">
+                            <i class="fas fa-credit-card me-2 text-primary"></i>
+                            Pagamento
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Forma de Pagamento:</strong> {{ pedido.get_forma_pagamento_display }}<br>
+                                <strong>Status:</strong> 
+                                {% if pedido.pagamento_confirmado %}
+                                    <span class="text-success"><i class="fas fa-check-circle me-1"></i>Confirmado</span>
+                                {% else %}
+                                    <span class="text-warning"><i class="fas fa-clock me-1"></i>Pendente</span>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {% if pedido.transaction_id %}
+                                    <strong>ID da Transação:</strong> {{ pedido.transaction_id }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if pedido.observacoes %}
+                        <!-- Observações -->
+                        <div class="info-card">
+                            <h5 class="mb-3">
+                                <i class="fas fa-sticky-note me-2 text-primary"></i>
+                                Observações
+                            </h5>
+                            <p class="mb-0">{{ pedido.observacoes }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Sidebar -->
+                <div class="col-lg-4">
+                    <!-- Resumo Financeiro -->
+                    <div class="total-section mb-4">
+                        <h5 class="mb-3">
+                            <i class="fas fa-calculator me-2"></i>
+                            Resumo Financeiro
+                        </h5>
+                        
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal:</span>
+                            <span>R$ {{ pedido.subtotal|floatformat:2 }}</span>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Frete:</span>
+                            <span>
+                                {% if pedido.valor_frete > 0 %}
+                                    R$ {{ pedido.valor_frete|floatformat:2 }}
+                                {% else %}
+                                    <span class="text-success">Grátis</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                        
+                        {% if pedido.desconto > 0 %}
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Desconto:</span>
+                                <span class="text-success">-R$ {{ pedido.desconto|floatformat:2 }}</span>
+                            </div>
+                        {% endif %}
+                        
+                        <hr>
+                        
+                        <div class="d-flex justify-content-between fw-bold fs-5">
+                            <span>Total:</span>
+                            <span class="text-primary">R$ {{ pedido.total|floatformat:2 }}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Histórico do Pedido -->
+                    <div class="info-card">
+                        <h5 class="mb-3">
+                            <i class="fas fa-history me-2"></i>
+                            Histórico do Pedido
+                        </h5>
+                        
+                        <div class="timeline">
+                            {% for status in historico %}
+                                <div class="timeline-item {% if forloop.first %}current{% endif %}">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="mb-0">{{ status.get_status_display }}</h6>
+                                        <small class="text-muted">{{ status.data_alteracao|date:"d/m H:i" }}</small>
+                                    </div>
+                                    
+                                    {% if status.observacao %}
+                                        <p class="mb-2 text-muted">{{ status.observacao }}</p>
+                                    {% endif %}
+                                    
+                                    {% if status.usuario_alteracao %}
+                                        <small class="text-muted">
+                                            <i class="fas fa-user me-1"></i>
+                                            Por: {{ status.usuario_alteracao.username }}
+                                        </small>
+                                    {% endif %}
+                                </div>
+                            {% empty %}
+                                <p class="text-muted">Nenhum histórico disponível.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Rastreamento -->
+                    {% if pedido.codigo_rastreamento %}
+                        <div class="info-card">
+                            <h5 class="mb-3">
+                                <i class="fas fa-truck me-2"></i>
+                                Rastreamento
+                            </h5>
+                            
+                            <div class="text-center">
+                                <div class="mb-3">
+                                    <strong>Código:</strong> {{ pedido.codigo_rastreamento }}
+                                </div>
+                                
+                                <a href="{% url 'pedidos:rastrear' pedido.numero_pedido %}" 
+                                   class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-external-link-alt me-1"></i>
+                                    Rastrear Entrega
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

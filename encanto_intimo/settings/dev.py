@@ -129,8 +129,20 @@ USE_L10N = True
 # Recarregar templates automaticamente
 TEMPLATES[0]['OPTIONS']['debug'] = True
 
+# =============================================================================
+# CONFIGURAÇÕES DO MERCADO PAGO
+# =============================================================================
+MERCADO_PAGO = {
+    'PUBLIC_KEY': config('MP_PUBLIC_KEY'),
+    'ACCESS_TOKEN': config('MP_ACCESS_TOKEN'),
+    'CLIENT_ID': config('MP_CLIENT_ID'),
+    'CLIENT_SECRET': config('MP_CLIENT_SECRET'),
+    'SANDBOX': True,  # True para ambiente de teste
+}
+
 print("🚀 Executando em modo DESENVOLVIMENTO")
 print(f"📁 BASE_DIR: {BASE_DIR}")
 print(f"🗄️  Database: MySQL ({config('DB_NAME', default='db_encanto')}@{config('DB_HOST', default='localhost')})")
 print(f"📧 Email: Console Backend")
 print(f"🔧 Debug: {DEBUG}")
+print(f"💳 Mercado Pago: Sandbox Mode")

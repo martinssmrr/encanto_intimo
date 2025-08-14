@@ -16,7 +16,7 @@ class Pagamento(models.Model):
 
     GATEWAY_CHOICES = [
         ('stripe', 'Stripe'),
-        ('mercadopago', 'Mercado Pago'),
+        ('mercado_pago', 'Mercado Pago'),
         ('pix', 'PIX'),
         ('boleto', 'Boleto'),
     ]
@@ -24,17 +24,23 @@ class Pagamento(models.Model):
     # Identificação
     id_pagamento = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     pedido = models.OneToOneField(Pedido, on_delete=models.CASCADE, related_name='pagamento')
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pagamentos')
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pagamentos', null=True, blank=True)
     
     # Detalhes do pagamento
-    gateway = models.CharField(max_length=20, choices=GATEWAY_CHOICES, verbose_name="Gateway de Pagamento")
+    gateway = models.CharField(max_length=20, choices=GATEWAY_CHOICES, default='mercado_pago', verbose_name="Gateway de Pagamento")
+    forma_pagamento = models.CharField(max_length=20, default='mercado_pago', verbose_name="Forma de Pagamento")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pendente', verbose_name="Status")
-    valor = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Valor")
+    valor = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name="Valor")
     
-    # IDs externos
+    # IDs externos - Mercado Pago
+    preference_id = models.CharField(max_length=200, blank=True, verbose_name="Preference ID (Mercado Pago)")
+    payment_id = models.CharField(max_length=200, blank=True, verbose_name="Payment ID (Mercado Pago)")
+    transaction_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name="Valor da Transação")
+    payment_method = models.CharField(max_length=50, blank=True, verbose_name="Método de Pagamento")
+    
+    # IDs externos - outros gateways
     transaction_id = models.CharField(max_length=200, blank=True, verbose_name="ID da Transação")
     payment_intent_id = models.CharField(max_length=200, blank=True, verbose_name="Payment Intent ID (Stripe)")
-    preference_id = models.CharField(max_length=200, blank=True, verbose_name="Preference ID (Mercado Pago)")
     
     # Dados do cartão (apenas últimos 4 dígitos)
     cartao_ultimos_digitos = models.CharField(max_length=4, blank=True, verbose_name="Últimos 4 Dígitos")

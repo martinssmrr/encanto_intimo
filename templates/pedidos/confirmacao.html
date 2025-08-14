@@ -1,0 +1,416 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pedido Confirmado - Encanto Íntimo{% endblock %}
+
+{% block extra_css %}
+<style>
+    .confirmation-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        overflow: hidden;
+        margin-top: 2rem;
+    }
+    
+    .success-header {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: white;
+        padding: 40px;
+        text-align: center;
+    }
+    
+    .success-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+    
+    .info-section {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 25px;
+        border-left: 4px solid #28a745;
+    }
+    
+    .next-steps {
+        background: #e8f5e8;
+        border-radius: 12px;
+        padding: 25px;
+        border: 2px solid #28a745;
+    }
+    
+    .btn-action {
+        margin-right: 10px;
+        margin-bottom: 10px;
+        min-width: 150px;
+    }
+    
+    .order-details {
+        background: #fff3cd;
+        border-radius: 12px;
+        padding: 25px;
+        border: 2px solid #FFD700;
+    }
+    
+    .payment-info {
+        background: #d1ecf1;
+        border-radius: 12px;
+        padding: 25px;
+        border-left: 4px solid #17a2b8;
+    }
+    
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 15px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #e9ecef;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 20px;
+        padding: 15px 20px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -37px;
+        top: 20px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #28a745;
+        border: 3px solid white;
+        box-shadow: 0 0 0 3px #e9ecef;
+    }
+    
+    .timeline-item.pending::before {
+        background: #ffc107;
+    }
+    
+    .timeline-item.future::before {
+        background: #e9ecef;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="confirmation-container">
+        <!-- Header de Sucesso -->
+        <div class="success-header">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h1 class="mb-3">Pedido Confirmado!</h1>
+            <p class="lead mb-0">
+                Seu pedido foi recebido com sucesso e está sendo processado.
+            </p>
+        </div>
+        
+        <div class="p-4">
+            <div class="row">
+                <!-- Informações Principais -->
+                <div class="col-lg-8">
+                    <!-- Dados do Pedido -->
+                    <div class="info-section">
+                        <h4 class="mb-3">
+                            <i class="fas fa-receipt me-2 text-success"></i>
+                            Dados do Pedido
+                        </h4>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Número do Pedido:</strong></p>
+                                <p class="fs-5 text-primary">#{{ pedido.numero_pedido|slice:":8" }}</p>
+                                
+                                <p><strong>Data do Pedido:</strong></p>
+                                <p>{{ pedido.data_pedido|date:"d/m/Y 'às' H:i" }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Status:</strong></p>
+                                <p>
+                                    <span class="badge bg-warning fs-6">
+                                        {{ pedido.get_status_display }}
+                                    </span>
+                                </p>
+                                
+                                <p><strong>Total:</strong></p>
+                                <p class="fs-4 text-success fw-bold">R$ {{ pedido.total|floatformat:2 }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Informações de Pagamento -->
+                    <div class="payment-info">
+                        <h4 class="mb-3">
+                            <i class="fas fa-credit-card me-2 text-info"></i>
+                            Informações de Pagamento
+                        </h4>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Forma de Pagamento:</strong></p>
+                                <p>{{ pedido.get_forma_pagamento_display }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Status do Pagamento:</strong></p>
+                                <p>
+                                    {% if pedido.pagamento_confirmado %}
+                                        <span class="text-success">
+                                            <i class="fas fa-check-circle me-1"></i>
+                                            Confirmado
+                                        </span>
+                                    {% else %}
+                                        <span class="text-warning">
+                                            <i class="fas fa-clock me-1"></i>
+                                            Aguardando Confirmação
+                                        </span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        {% if pedido.forma_pagamento == 'pix' and not pedido.pagamento_confirmado %}
+                            <div class="alert alert-info mt-3">
+                                <h6><i class="fas fa-qrcode me-2"></i>Pagamento via PIX</h6>
+                                <p class="mb-2">Complete o pagamento usando o código PIX que foi enviado para seu e-mail.</p>
+                                <p class="mb-0">
+                                    <strong>Importante:</strong> O pagamento via PIX é processado instantaneamente. 
+                                    Após a confirmação, você receberá um e-mail de confirmação.
+                                </p>
+                            </div>
+                        {% elif pedido.forma_pagamento == 'boleto' and not pedido.pagamento_confirmado %}
+                            <div class="alert alert-warning mt-3">
+                                <h6><i class="fas fa-barcode me-2"></i>Boleto Bancário</h6>
+                                <p class="mb-2">O boleto foi enviado para seu e-mail e está disponível para download.</p>
+                                <p class="mb-0">
+                                    <strong>Vencimento:</strong> {{ pedido.data_pedido|date:"d/m/Y"|add_days:3 }}
+                                    <br>
+                                    <strong>Atenção:</strong> O pedido será confirmado após a compensação do boleto (até 2 dias úteis).
+                                </p>
+                            </div>
+                        {% elif pedido.forma_pagamento == 'cartao' and not pedido.pagamento_confirmado %}
+                            <div class="alert alert-info mt-3">
+                                <h6><i class="fas fa-credit-card me-2"></i>Cartão de Crédito</h6>
+                                <p class="mb-0">
+                                    Seu pagamento está sendo processado. Você receberá um e-mail de confirmação em breve.
+                                </p>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Endereço de Entrega -->
+                    <div class="info-section">
+                        <h4 class="mb-3">
+                            <i class="fas fa-map-marker-alt me-2 text-primary"></i>
+                            Endereço de Entrega
+                        </h4>
+                        
+                        <address class="mb-0">
+                            <strong>{{ pedido.nome_cliente }}</strong><br>
+                            {{ pedido.endereco }}, {{ pedido.numero }}<br>
+                            {% if pedido.complemento %}{{ pedido.complemento }}<br>{% endif %}
+                            {{ pedido.bairro }}<br>
+                            {{ pedido.cidade }}/{{ pedido.estado }} - {{ pedido.cep }}
+                        </address>
+                        
+                        <div class="mt-3">
+                            <p class="mb-1"><strong>Telefone:</strong> {{ pedido.telefone_cliente }}</p>
+                            <p class="mb-0"><strong>E-mail:</strong> {{ pedido.email_cliente }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Próximos Passos -->
+                    <div class="next-steps">
+                        <h4 class="mb-3">
+                            <i class="fas fa-clipboard-list me-2 text-success"></i>
+                            Próximos Passos
+                        </h4>
+                        
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <h6 class="mb-1">1. Confirmação do Pagamento</h6>
+                                <small class="text-muted">
+                                    {% if pedido.pagamento_confirmado %}
+                                        Pagamento confirmado em {{ pedido.data_pedido|date:"d/m/Y H:i" }}
+                                    {% else %}
+                                        Aguardando confirmação do pagamento
+                                    {% endif %}
+                                </small>
+                            </div>
+                            
+                            <div class="timeline-item {% if not pedido.pagamento_confirmado %}pending{% endif %}">
+                                <h6 class="mb-1">2. Processamento do Pedido</h6>
+                                <small class="text-muted">Separação e preparação dos itens</small>
+                            </div>
+                            
+                            <div class="timeline-item future">
+                                <h6 class="mb-1">3. Envio</h6>
+                                <small class="text-muted">Produtos enviados pelos Correios</small>
+                            </div>
+                            
+                            <div class="timeline-item future">
+                                <h6 class="mb-1">4. Entrega</h6>
+                                <small class="text-muted">Recebimento no endereço informado</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Ações Disponíveis -->
+                    <div class="text-center mt-4">
+                        <a href="{% url 'pedidos:detalhe' pedido.numero_pedido %}" 
+                           class="btn btn-primary btn-action">
+                            <i class="fas fa-eye me-2"></i>
+                            Ver Detalhes
+                        </a>
+                        
+                        <a href="{% url 'pedidos:meus_pedidos' %}" 
+                           class="btn btn-outline-primary btn-action">
+                            <i class="fas fa-list me-2"></i>
+                            Meus Pedidos
+                        </a>
+                        
+                        <a href="{% url 'produtos:lista' %}" 
+                           class="btn btn-outline-secondary btn-action">
+                            <i class="fas fa-shopping-bag me-2"></i>
+                            Continuar Comprando
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Sidebar com Resumo -->
+                <div class="col-lg-4">
+                    <!-- Resumo do Pedido -->
+                    <div class="order-details">
+                        <h5 class="mb-3">
+                            <i class="fas fa-shopping-cart me-2"></i>
+                            Itens do Pedido
+                        </h5>
+                        
+                        {% for item in pedido.itens.all %}
+                            <div class="d-flex justify-content-between align-items-start mb-3 pb-3 border-bottom">
+                                <div class="flex-grow-1 me-3">
+                                    <h6 class="mb-1">{{ item.nome_produto }}</h6>
+                                    <small class="text-muted">
+                                        Qtd: {{ item.quantidade }}
+                                        {% if item.tamanho %} | {{ item.tamanho }}{% endif %}
+                                        {% if item.cor %} | {{ item.cor }}{% endif %}
+                                    </small>
+                                </div>
+                                <div class="text-end">
+                                    <div class="fw-bold">R$ {{ item.total_item|floatformat:2 }}</div>
+                                    <small class="text-muted">Unit: R$ {{ item.preco_unitario|floatformat:2 }}</small>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        
+                        <div class="mt-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Subtotal:</span>
+                                <span>R$ {{ pedido.subtotal|floatformat:2 }}</span>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Frete:</span>
+                                <span>
+                                    {% if pedido.valor_frete > 0 %}
+                                        R$ {{ pedido.valor_frete|floatformat:2 }}
+                                    {% else %}
+                                        <span class="text-success">Grátis</span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            
+                            {% if pedido.desconto > 0 %}
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Desconto:</span>
+                                    <span class="text-success">-R$ {{ pedido.desconto|floatformat:2 }}</span>
+                                </div>
+                            {% endif %}
+                            
+                            <hr>
+                            
+                            <div class="d-flex justify-content-between fw-bold fs-5">
+                                <span>Total:</span>
+                                <span class="text-success">R$ {{ pedido.total|floatformat:2 }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Informações Importantes -->
+                    <div class="info-section mt-4">
+                        <h6><i class="fas fa-info-circle me-2"></i>Informações Importantes</h6>
+                        
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2">
+                                <i class="fas fa-envelope me-2 text-primary"></i>
+                                <small>Um e-mail de confirmação foi enviado para {{ pedido.email_cliente }}</small>
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-truck me-2 text-primary"></i>
+                                <small>Prazo de entrega: 5 a 10 dias úteis após a confirmação do pagamento</small>
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-undo me-2 text-primary"></i>
+                                <small>Você pode cancelar este pedido enquanto ele não for enviado</small>
+                            </li>
+                            <li class="mb-0">
+                                <i class="fas fa-headset me-2 text-primary"></i>
+                                <small>Dúvidas? Entre em contato pelo WhatsApp: (11) 99999-9999</small>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Atualizar status do pagamento a cada 30 segundos se estiver pendente
+    {% if not pedido.pagamento_confirmado %}
+        setInterval(function() {
+            fetch(window.location.href, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.pagamento_confirmado) {
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                console.log('Erro ao verificar status do pagamento:', error);
+            });
+        }, 30000); // 30 segundos
+    {% endif %}
+});
+</script>
+{% endblock %}

@@ -1,0 +1,440 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cancelar Pedido #{{ pedido.numero_pedido|slice:":8" }} - Encanto Íntimo{% endblock %}
+
+{% block extra_css %}
+<style>
+    .cancel-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    .warning-header {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        color: white;
+        padding: 30px;
+        text-align: center;
+    }
+    
+    .warning-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+    
+    .cancel-form {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 25px;
+        border-left: 4px solid #dc3545;
+    }
+    
+    .order-summary {
+        background: #fff3cd;
+        border-radius: 12px;
+        padding: 25px;
+        border: 2px solid #FFD700;
+    }
+    
+    .policy-info {
+        background: #e8f5e8;
+        border-radius: 12px;
+        padding: 25px;
+        border-left: 4px solid #28a745;
+    }
+    
+    .btn-cancel {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        border: none;
+        color: white;
+        padding: 15px 30px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 25px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-cancel:hover {
+        background: linear-gradient(135deg, #c82333, #bd2130);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(220, 53, 69, 0.3);
+    }
+    
+    .btn-back {
+        background: #6c757d;
+        border: none;
+        color: white;
+        padding: 15px 30px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 25px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-back:hover {
+        background: #5a6268;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(108, 117, 125, 0.3);
+    }
+    
+    .refund-info {
+        background: #d1ecf1;
+        border-radius: 12px;
+        padding: 25px;
+        border-left: 4px solid #17a2b8;
+    }
+    
+    .status-badge {
+        padding: 8px 16px;
+        border-radius: 25px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        display: inline-block;
+    }
+    
+    .status-pendente { background: #fff3cd; color: #856404; }
+    .status-confirmado { background: #d1ecf1; color: #0c5460; }
+    .status-processando { background: #ffecd1; color: #8a4b00; }
+    .status-enviado { background: #e2d9f3; color: #5a2d82; }
+    .status-entregue { background: #d4edda; color: #155724; }
+    .status-cancelado { background: #f8d7da; color: #721c24; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="cancel-container">
+        <!-- Header de Aviso -->
+        <div class="warning-header">
+            <div class="warning-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h1 class="mb-3">Cancelar Pedido</h1>
+            <p class="lead mb-0">
+                Você está prestes a cancelar seu pedido. Esta ação não pode ser desfeita.
+            </p>
+        </div>
+        
+        <div class="p-4">
+            {% if not pedido.pode_cancelar %}
+                <!-- Pedido não pode ser cancelado -->
+                <div class="alert alert-danger" role="alert">
+                    <h4 class="alert-heading">
+                        <i class="fas fa-times-circle me-2"></i>
+                        Cancelamento não permitido
+                    </h4>
+                    <p class="mb-0">
+                        Este pedido não pode mais ser cancelado pois já foi 
+                        {% if pedido.status == 'enviado' %}
+                            enviado
+                        {% elif pedido.status == 'entregue' %}
+                            entregue
+                        {% else %}
+                            processado
+                        {% endif %}.
+                    </p>
+                    <hr>
+                    <p class="mb-0">
+                        Se você tem algum problema com seu pedido, entre em contato conosco 
+                        pelo WhatsApp: <strong>(11) 99999-9999</strong>
+                    </p>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <a href="{% url 'pedidos:detalhe' pedido.numero_pedido %}" 
+                       class="btn btn-back me-3">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar aos Detalhes
+                    </a>
+                    
+                    <a href="{% url 'pedidos:meus_pedidos' %}" 
+                       class="btn btn-outline-secondary">
+                        <i class="fas fa-list me-2"></i>
+                        Meus Pedidos
+                    </a>
+                </div>
+            {% else %}
+                <!-- Formulário de cancelamento -->
+                <div class="row">
+                    <div class="col-lg-8">
+                        <!-- Dados do Pedido -->
+                        <div class="cancel-form mb-4">
+                            <h4 class="mb-3">
+                                <i class="fas fa-receipt me-2 text-danger"></i>
+                                Dados do Pedido
+                            </h4>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Número:</strong> #{{ pedido.numero_pedido|slice:":8" }}</p>
+                                    <p><strong>Data:</strong> {{ pedido.data_pedido|date:"d/m/Y 'às' H:i" }}</p>
+                                    <p><strong>Total:</strong> <span class="text-success fw-bold">R$ {{ pedido.total|floatformat:2 }}</span></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Status:</strong></p>
+                                    <span class="status-badge status-{{ pedido.status }}">
+                                        {{ pedido.get_status_display }}
+                                    </span>
+                                    
+                                    <p class="mt-2"><strong>Pagamento:</strong></p>
+                                    <p>
+                                        {% if pedido.pagamento_confirmado %}
+                                            <span class="text-success">
+                                                <i class="fas fa-check-circle me-1"></i>
+                                                Confirmado
+                                            </span>
+                                        {% else %}
+                                            <span class="text-warning">
+                                                <i class="fas fa-clock me-1"></i>
+                                                Pendente
+                                            </span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Informações sobre Reembolso -->
+                        {% if pedido.pagamento_confirmado %}
+                            <div class="refund-info mb-4">
+                                <h4 class="mb-3">
+                                    <i class="fas fa-undo me-2 text-info"></i>
+                                    Informações sobre Reembolso
+                                </h4>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6>Forma de Pagamento:</h6>
+                                        <p>{{ pedido.get_forma_pagamento_display }}</p>
+                                        
+                                        <h6>Valor a ser Reembolsado:</h6>
+                                        <p class="fs-5 fw-bold text-success">R$ {{ pedido.total|floatformat:2 }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Prazo para Reembolso:</h6>
+                                        {% if pedido.forma_pagamento == 'pix' %}
+                                            <p>Até 2 dias úteis</p>
+                                        {% elif pedido.forma_pagamento == 'cartao' %}
+                                            <p>5 a 15 dias úteis na fatura do cartão</p>
+                                        {% elif pedido.forma_pagamento == 'boleto' %}
+                                            <p>Até 10 dias úteis por transferência bancária</p>
+                                        {% else %}
+                                            <p>Conforme forma de pagamento utilizada</p>
+                                        {% endif %}
+                                        
+                                        <h6 class="mt-3">Como Receber:</h6>
+                                        {% if pedido.forma_pagamento == 'pix' %}
+                                            <p>Estorno automático na conta de origem</p>
+                                        {% elif pedido.forma_pagamento == 'cartao' %}
+                                            <p>Estorno no cartão utilizado</p>
+                                        {% elif pedido.forma_pagamento == 'boleto' %}
+                                            <p>Transferência para conta bancária (entraremos em contato)</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Política de Cancelamento -->
+                        <div class="policy-info">
+                            <h4 class="mb-3">
+                                <i class="fas fa-info-circle me-2 text-success"></i>
+                                Política de Cancelamento
+                            </h4>
+                            
+                            <ul class="mb-0">
+                                <li class="mb-2">
+                                    <strong>Cancelamento Gratuito:</strong> Até o momento do envio do pedido
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Reembolso Integral:</strong> 100% do valor pago será devolvido
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Prazo de Processamento:</strong> O cancelamento é processado imediatamente
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Estoque:</strong> Os produtos serão automaticamente retornados ao estoque
+                                </li>
+                                <li class="mb-0">
+                                    <strong>Confirmação:</strong> Você receberá um e-mail confirmando o cancelamento
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Formulário de Cancelamento -->
+                        <form method="post" class="mt-4">
+                            {% csrf_token %}
+                            
+                            <div class="cancel-form">
+                                <h4 class="mb-3">Motivo do Cancelamento (Opcional)</h4>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="motivo" 
+                                               value="mudanca_endereco" id="motivo1">
+                                        <label class="form-check-label" for="motivo1">
+                                            Mudança de endereço
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="motivo" 
+                                               value="mudei_de_ideia" id="motivo2">
+                                        <label class="form-check-label" for="motivo2">
+                                            Mudei de ideia
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="motivo" 
+                                               value="prazo_entrega" id="motivo3">
+                                        <label class="form-check-label" for="motivo3">
+                                            Prazo de entrega muito longo
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="motivo" 
+                                               value="preco" id="motivo4">
+                                        <label class="form-check-label" for="motivo4">
+                                            Encontrei por melhor preço
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="motivo" 
+                                               value="outro" id="motivo5">
+                                        <label class="form-check-label" for="motivo5">
+                                            Outro motivo
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="observacoes" class="form-label">
+                                        Observações adicionais (opcional)
+                                    </label>
+                                    <textarea class="form-control" id="observacoes" name="observacoes" 
+                                              rows="3" placeholder="Conte-nos mais sobre o motivo do cancelamento..."></textarea>
+                                </div>
+                                
+                                <div class="form-check mb-4">
+                                    <input class="form-check-input" type="checkbox" id="confirmo" 
+                                           name="confirmo" required>
+                                    <label class="form-check-label" for="confirmo">
+                                        <strong>Confirmo que desejo cancelar este pedido e estou ciente de que esta ação não pode ser desfeita.</strong>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-cancel me-3" 
+                                        onclick="return confirm('Tem certeza que deseja cancelar este pedido? Esta ação não pode ser desfeita.')">
+                                    <i class="fas fa-times me-2"></i>
+                                    Confirmar Cancelamento
+                                </button>
+                                
+                                <a href="{% url 'pedidos:detalhe' pedido.numero_pedido %}" 
+                                   class="btn btn-back">
+                                    <i class="fas fa-arrow-left me-2"></i>
+                                    Manter Pedido
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Sidebar com Resumo -->
+                    <div class="col-lg-4">
+                        <!-- Resumo do Pedido -->
+                        <div class="order-summary">
+                            <h5 class="mb-3">
+                                <i class="fas fa-shopping-cart me-2"></i>
+                                Resumo do Pedido
+                            </h5>
+                            
+                            {% for item in pedido.itens.all %}
+                                <div class="d-flex justify-content-between align-items-start mb-3 pb-3 border-bottom">
+                                    <div class="flex-grow-1 me-3">
+                                        <h6 class="mb-1">{{ item.nome_produto }}</h6>
+                                        <small class="text-muted">
+                                            Qtd: {{ item.quantidade }}
+                                            {% if item.tamanho %} | {{ item.tamanho }}{% endif %}
+                                            {% if item.cor %} | {{ item.cor }}{% endif %}
+                                        </small>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="fw-bold">R$ {{ item.total_item|floatformat:2 }}</div>
+                                        <small class="text-muted">Unit: R$ {{ item.preco_unitario|floatformat:2 }}</small>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Subtotal:</span>
+                                    <span>R$ {{ pedido.subtotal|floatformat:2 }}</span>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Frete:</span>
+                                    <span>
+                                        {% if pedido.valor_frete > 0 %}
+                                            R$ {{ pedido.valor_frete|floatformat:2 }}
+                                        {% else %}
+                                            <span class="text-success">Grátis</span>
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                
+                                {% if pedido.desconto > 0 %}
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Desconto:</span>
+                                        <span class="text-success">-R$ {{ pedido.desconto|floatformat:2 }}</span>
+                                    </div>
+                                {% endif %}
+                                
+                                <hr>
+                                
+                                <div class="d-flex justify-content-between fw-bold fs-5">
+                                    <span>Total a ser Reembolsado:</span>
+                                    <span class="text-success">R$ {{ pedido.total|floatformat:2 }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Contato -->
+                        <div class="cancel-form mt-4">
+                            <h6><i class="fas fa-headset me-2"></i>Precisa de Ajuda?</h6>
+                            
+                            <p class="mb-2">
+                                Se você tem dúvidas sobre o cancelamento ou quer resolver algum problema 
+                                sem cancelar o pedido, entre em contato conosco:
+                            </p>
+                            
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2">
+                                    <i class="fab fa-whatsapp me-2 text-success"></i>
+                                    <strong>WhatsApp:</strong> (11) 99999-9999
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-envelope me-2 text-primary"></i>
+                                    <strong>E-mail:</strong> contato@encantointimo.com.br
+                                </li>
+                                <li class="mb-0">
+                                    <i class="fas fa-clock me-2 text-info"></i>
+                                    <strong>Horário:</strong> Segunda a Sexta, 9h às 18h
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

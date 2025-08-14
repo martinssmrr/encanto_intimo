@@ -1,0 +1,460 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Rastreamento - Pedido #{{ pedido.numero_pedido|slice:":8" }} - Encanto Íntimo{% endblock %}
+
+{% block extra_css %}
+<style>
+    .tracking-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    .header-section {
+        background: linear-gradient(135deg, #17a2b8, #138496);
+        color: white;
+        padding: 30px;
+    }
+    
+    .tracking-info {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 25px;
+        border-left: 4px solid #17a2b8;
+    }
+    
+    .status-badge {
+        padding: 8px 16px;
+        border-radius: 25px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        display: inline-block;
+    }
+    
+    .status-pendente { background: #fff3cd; color: #856404; }
+    .status-confirmado { background: #d1ecf1; color: #0c5460; }
+    .status-processando { background: #ffecd1; color: #8a4b00; }
+    .status-enviado { background: #e2d9f3; color: #5a2d82; }
+    .status-entregue { background: #d4edda; color: #155724; }
+    .status-cancelado { background: #f8d7da; color: #721c24; }
+    
+    .tracking-timeline {
+        position: relative;
+        padding-left: 40px;
+    }
+    
+    .tracking-timeline::before {
+        content: '';
+        position: absolute;
+        left: 20px;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: #e9ecef;
+    }
+    
+    .tracking-step {
+        position: relative;
+        margin-bottom: 30px;
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .tracking-step:hover {
+        transform: translateY(-2px);
+    }
+    
+    .tracking-step::before {
+        content: '';
+        position: absolute;
+        left: -48px;
+        top: 30px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #e9ecef;
+        border: 4px solid white;
+        box-shadow: 0 0 0 4px #e9ecef;
+    }
+    
+    .tracking-step.completed::before {
+        background: #28a745;
+        box-shadow: 0 0 0 4px #28a745;
+    }
+    
+    .tracking-step.current::before {
+        background: #ffc107;
+        box-shadow: 0 0 0 4px #ffc107;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+    
+    .tracking-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 20px;
+        font-size: 1.5rem;
+    }
+    
+    .icon-pending { background: #fff3cd; color: #856404; }
+    .icon-confirmed { background: #d1ecf1; color: #0c5460; }
+    .icon-processing { background: #ffecd1; color: #8a4b00; }
+    .icon-shipped { background: #e2d9f3; color: #5a2d82; }
+    .icon-delivered { background: #d4edda; color: #155724; }
+    
+    .external-tracking {
+        background: #e8f5e8;
+        border-radius: 12px;
+        padding: 25px;
+        border: 2px solid #28a745;
+        text-align: center;
+    }
+    
+    .btn-track {
+        background: linear-gradient(135deg, #17a2b8, #138496);
+        border: none;
+        color: white;
+        padding: 12px 25px;
+        font-weight: 600;
+        border-radius: 25px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-track:hover {
+        background: linear-gradient(135deg, #138496, #117a8b);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(23, 162, 184, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="tracking-container">
+        <!-- Header -->
+        <div class="header-section">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h2><i class="fas fa-truck me-2"></i>Rastreamento do Pedido</h2>
+                    <p class="mb-0">Acompanhe o status da sua entrega</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <span class="status-badge status-{{ pedido.status }}">
+                        {{ pedido.get_status_display }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="p-4">
+            <!-- Informações do Pedido -->
+            <div class="tracking-info">
+                <div class="row">
+                    <div class="col-md-3">
+                        <h6>Número do Pedido</h6>
+                        <p class="fw-bold text-primary">#{{ pedido.numero_pedido|slice:":8" }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h6>Data do Pedido</h6>
+                        <p>{{ pedido.data_pedido|date:"d/m/Y H:i" }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h6>Código de Rastreamento</h6>
+                        <p class="fw-bold">
+                            {% if pedido.codigo_rastreamento %}
+                                {{ pedido.codigo_rastreamento }}
+                            {% else %}
+                                <span class="text-muted">Aguardando envio</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-3">
+                        <h6>Total do Pedido</h6>
+                        <p class="fw-bold text-success">R$ {{ pedido.total|floatformat:2 }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <!-- Timeline de Rastreamento -->
+                <div class="col-lg-8">
+                    <h4 class="mb-4">Status da Entrega</h4>
+                    
+                    <div class="tracking-timeline">
+                        <!-- Pedido Criado -->
+                        <div class="tracking-step completed">
+                            <div class="d-flex align-items-center">
+                                <div class="tracking-icon icon-confirmed">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h5 class="mb-1">Pedido Realizado</h5>
+                                    <p class="text-muted mb-2">Seu pedido foi recebido e está sendo processado</p>
+                                    <small class="text-success">
+                                        <i class="fas fa-check me-1"></i>
+                                        Concluído em {{ pedido.data_pedido|date:"d/m/Y 'às' H:i" }}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Pagamento Confirmado -->
+                        <div class="tracking-step {% if pedido.pagamento_confirmado %}completed{% else %}current{% endif %}">
+                            <div class="d-flex align-items-center">
+                                <div class="tracking-icon {% if pedido.pagamento_confirmado %}icon-confirmed{% else %}icon-pending{% endif %}">
+                                    <i class="fas fa-credit-card"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h5 class="mb-1">Pagamento Confirmado</h5>
+                                    <p class="text-muted mb-2">
+                                        {% if pedido.pagamento_confirmado %}
+                                            Pagamento aprovado e processado com sucesso
+                                        {% else %}
+                                            Aguardando confirmação do pagamento
+                                        {% endif %}
+                                    </p>
+                                    {% if pedido.pagamento_confirmado %}
+                                        <small class="text-success">
+                                            <i class="fas fa-check me-1"></i>
+                                            Confirmado
+                                        </small>
+                                    {% else %}
+                                        <small class="text-warning">
+                                            <i class="fas fa-clock me-1"></i>
+                                            Pendente - Forma de pagamento: {{ pedido.get_forma_pagamento_display }}
+                                        </small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Pedido em Preparação -->
+                        <div class="tracking-step {% if pedido.status == 'processando' %}current{% elif pedido.status in 'enviado,entregue' %}completed{% endif %}">
+                            <div class="d-flex align-items-center">
+                                <div class="tracking-icon {% if pedido.status == 'processando' %}icon-processing{% elif pedido.status in 'enviado,entregue' %}icon-confirmed{% else %}icon-pending{% endif %}">
+                                    <i class="fas fa-box"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h5 class="mb-1">Preparando Pedido</h5>
+                                    <p class="text-muted mb-2">Separação e embalagem dos produtos</p>
+                                    {% if pedido.status == 'processando' %}
+                                        <small class="text-warning">
+                                            <i class="fas fa-spinner fa-spin me-1"></i>
+                                            Em andamento
+                                        </small>
+                                    {% elif pedido.status in 'enviado,entregue' %}
+                                        <small class="text-success">
+                                            <i class="fas fa-check me-1"></i>
+                                            Concluído
+                                        </small>
+                                    {% else %}
+                                        <small class="text-muted">
+                                            <i class="fas fa-clock me-1"></i>
+                                            Aguardando
+                                        </small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Pedido Enviado -->
+                        <div class="tracking-step {% if pedido.status == 'enviado' %}current{% elif pedido.status == 'entregue' %}completed{% endif %}">
+                            <div class="d-flex align-items-center">
+                                <div class="tracking-icon {% if pedido.status == 'enviado' %}icon-shipped{% elif pedido.status == 'entregue' %}icon-confirmed{% else %}icon-pending{% endif %}">
+                                    <i class="fas fa-truck"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h5 class="mb-1">Enviado</h5>
+                                    <p class="text-muted mb-2">Pedido despachado e em trânsito</p>
+                                    {% if pedido.status == 'enviado' %}
+                                        <small class="text-primary">
+                                            <i class="fas fa-truck me-1"></i>
+                                            Em trânsito
+                                        </small>
+                                        {% if pedido.codigo_rastreamento %}
+                                            <br>
+                                            <small class="text-muted">
+                                                Código: {{ pedido.codigo_rastreamento }}
+                                            </small>
+                                        {% endif %}
+                                    {% elif pedido.status == 'entregue' %}
+                                        <small class="text-success">
+                                            <i class="fas fa-check me-1"></i>
+                                            Enviado com sucesso
+                                        </small>
+                                    {% else %}
+                                        <small class="text-muted">
+                                            <i class="fas fa-clock me-1"></i>
+                                            Aguardando envio
+                                        </small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Pedido Entregue -->
+                        <div class="tracking-step {% if pedido.status == 'entregue' %}completed{% endif %}">
+                            <div class="d-flex align-items-center">
+                                <div class="tracking-icon {% if pedido.status == 'entregue' %}icon-delivered{% else %}icon-pending{% endif %}">
+                                    <i class="fas fa-home"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h5 class="mb-1">Entregue</h5>
+                                    <p class="text-muted mb-2">Pedido entregue no endereço de destino</p>
+                                    {% if pedido.status == 'entregue' %}
+                                        <small class="text-success">
+                                            <i class="fas fa-check me-1"></i>
+                                            Entrega concluída
+                                        </small>
+                                    {% else %}
+                                        <small class="text-muted">
+                                            <i class="fas fa-clock me-1"></i>
+                                            Aguardando entrega
+                                        </small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sidebar -->
+                <div class="col-lg-4">
+                    <!-- Rastreamento Externo -->
+                    {% if pedido.codigo_rastreamento %}
+                        <div class="external-tracking mb-4">
+                            <h5 class="mb-3">
+                                <i class="fas fa-external-link-alt me-2"></i>
+                                Rastreamento nos Correios
+                            </h5>
+                            
+                            <p class="mb-3">
+                                Use o código abaixo para rastrear seu pedido diretamente no site dos Correios:
+                            </p>
+                            
+                            <div class="mb-3">
+                                <strong>{{ pedido.codigo_rastreamento }}</strong>
+                            </div>
+                            
+                            <a href="https://www2.correios.com.br/sistemas/rastreamento/" 
+                               target="_blank" 
+                               class="btn btn-track">
+                                <i class="fas fa-external-link-alt me-2"></i>
+                                Rastrear nos Correios
+                            </a>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Informações de Entrega -->
+                    <div class="tracking-info">
+                        <h5 class="mb-3">
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            Endereço de Entrega
+                        </h5>
+                        
+                        <address class="mb-3">
+                            <strong>{{ pedido.nome_cliente }}</strong><br>
+                            {{ pedido.endereco }}, {{ pedido.numero }}<br>
+                            {% if pedido.complemento %}{{ pedido.complemento }}<br>{% endif %}
+                            {{ pedido.bairro }}<br>
+                            {{ pedido.cidade }}/{{ pedido.estado }} - {{ pedido.cep }}
+                        </address>
+                        
+                        <div class="mb-3">
+                            <strong>Telefone:</strong> {{ pedido.telefone_cliente }}
+                        </div>
+                        
+                        <div class="mb-0">
+                            <strong>E-mail:</strong> {{ pedido.email_cliente }}
+                        </div>
+                    </div>
+                    
+                    <!-- Itens do Pedido -->
+                    <div class="tracking-info">
+                        <h5 class="mb-3">
+                            <i class="fas fa-box me-2"></i>
+                            Itens ({{ pedido.total_itens }})
+                        </h5>
+                        
+                        {% for item in pedido.itens.all %}
+                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 {% if not forloop.last %}border-bottom{% endif %}">
+                                <div class="flex-grow-1 me-2">
+                                    <small class="fw-bold">{{ item.nome_produto }}</small>
+                                    <br>
+                                    <small class="text-muted">
+                                        Qtd: {{ item.quantidade }}
+                                        {% if item.tamanho %} | {{ item.tamanho }}{% endif %}
+                                        {% if item.cor %} | {{ item.cor }}{% endif %}
+                                    </small>
+                                </div>
+                                <small class="fw-bold">R$ {{ item.total_item|floatformat:2 }}</small>
+                            </div>
+                        {% endfor %}
+                        
+                        <div class="mt-3 pt-3 border-top">
+                            <div class="d-flex justify-content-between fw-bold">
+                                <span>Total:</span>
+                                <span class="text-success">R$ {{ pedido.total|floatformat:2 }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Ações -->
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'pedidos:detalhe' pedido.numero_pedido %}" 
+                           class="btn btn-outline-primary">
+                            <i class="fas fa-eye me-2"></i>
+                            Ver Detalhes Completos
+                        </a>
+                        
+                        <a href="{% url 'pedidos:meus_pedidos' %}" 
+                           class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Voltar aos Pedidos
+                        </a>
+                        
+                        {% if pedido.pode_cancelar %}
+                            <a href="{% url 'pedidos:cancelar' pedido.numero_pedido %}" 
+                               class="btn btn-outline-danger"
+                               onclick="return confirm('Tem certeza que deseja cancelar este pedido?')">
+                                <i class="fas fa-times me-2"></i>
+                                Cancelar Pedido
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-refresh a cada 5 minutos se o pedido estiver em trânsito
+    {% if pedido.status == 'enviado' %}
+        setInterval(function() {
+            window.location.reload();
+        }, 300000); // 5 minutos
+    {% endif %}
+});
+</script>
+{% endblock %}
